@@ -286,14 +286,14 @@
     if (!blobs.length) return;
     var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    var DEFAULTS = { opacity:0.32, blur:70, scale:1, depthMul:1, speedMul:1, hueRange:14 };
+    var DEFAULTS = { opacity:0.85, blur:120, scale:1.15, depthMul:3, speedMul:3, hueRange:50 };
     var P;
-    try { var s = JSON.parse(localStorage.getItem("bf_bg_tune")); P = s ? Object.assign({}, DEFAULTS, s) : Object.assign({}, DEFAULTS); }
+    try { var s = JSON.parse(localStorage.getItem("bf_bg_tune2")); P = s ? Object.assign({}, DEFAULTS, s) : Object.assign({}, DEFAULTS); }
     catch (e) { P = Object.assign({}, DEFAULTS); }
-    function save(){ try { localStorage.setItem("bf_bg_tune", JSON.stringify(P)); } catch (e) {} }
+    function save(){ try { localStorage.setItem("bf_bg_tune2", JSON.stringify(P)); } catch (e) {} }
 
     var conf = blobs.map(function(_, i){
-      return { depth: 30 + i*18, sx: 0.00020 + i*0.00006, sy: 0.00026 + i*0.00005,
+      return { depth: 90 + i*54, sx: 0.00020 + i*0.00006, sy: 0.00026 + i*0.00005,
                ax: 24 + i*8, ay: 20 + i*7, dir: (i % 2 ? -1 : 1), cx: 0, cy: 0 };
     });
     var tx = 0, ty = 0, hue = 0, hueT = 0;
