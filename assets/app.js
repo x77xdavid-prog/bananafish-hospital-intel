@@ -509,10 +509,53 @@
 
   function bindToolbar() {
     var s = el("search"), deb;
+    // 최근 검색어(구글식) — localStorage 저장, 시계 아이콘, 항목별 × 삭제
+    var HIST_KEY = "bf_search_hist", HIST_MAX = 8;
+    var histBox = document.createElement("div");
+    histBox.className = "search-hist"; histBox.id = "searchHist"; histBox.hidden = true;
+    s.parentNode.appendChild(histBox); // .searchbox 는 position:relative
+
+    function loadHist() { try { var a = JSON.parse(localStorage.getItem(HIST_KEY)); return Array.isArray(a) ? a : []; } catch (e) { return []; } }
+    function saveHist(a) { try { localStorage.setItem(HIST_KEY, JSON.stringify(a.slice(0, HIST_MAX))); } catch (e) {} }
+    function addHist(term) { term = term.trim(); if (!term) return; var a = loadHist().filter(function (t) { return t !== term; }); a.unshift(term); saveHist(a); }
+    function delHist(term) { saveHist(loadHist().filter(function (t) { return t !== term; })); }
+    function renderHist() {
+      var typed = s.value.trim().toLowerCase();
+      var items = loadHist().filter(function (t) { return !typed || t.toLowerCase().indexOf(typed) !== -1; });
+      if (!items.length) { histBox.hidden = true; histBox.innerHTML = ""; return; }
+      histBox.innerHTML = items.map(function (t) {
+        return '<div class="sh-row"><button type="button" class="sh-pick" data-term="' + esc(t) + '">' +
+          '<svg class="sh-clock" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 7v5l3 2M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>' +
+          '<span class="sh-term">' + esc(t) + '</span></button>' +
+          '<button type="button" class="sh-del" data-del="' + esc(t) + '" aria-label="삭제">×</button></div>';
+      }).join("");
+      histBox.hidden = false;
+    }
+    function commitSearch(term) {
+      term = String(term).trim();
+      s.value = term; addHist(term);
+      histBox.hidden = true;
+      if (term) el("directorySection").scrollIntoView({ behavior: "smooth", block: "start" });
+      state.q = term.toLowerCase(); refresh(true);
+    }
+
     s.addEventListener("input", function () {
       clearTimeout(deb);
       deb = setTimeout(function () { state.q = s.value.trim().toLowerCase(); refresh(true); }, 130);
+      renderHist();
     });
+    s.addEventListener("focus", renderHist);
+    s.addEventListener("keydown", function (e) {
+      if (e.key === "Enter") { e.preventDefault(); commitSearch(s.value); }
+      else if (e.key === "Escape") { histBox.hidden = true; }
+    });
+    histBox.addEventListener("mousedown", function (e) { // mousedown: input blur 이전에 처리
+      var del = e.target.closest(".sh-del");
+      if (del) { e.preventDefault(); delHist(del.dataset.del); renderHist(); s.focus(); return; }
+      var pick = e.target.closest(".sh-pick");
+      if (pick) { e.preventDefault(); commitSearch(pick.dataset.term); }
+    });
+    document.addEventListener("click", function (e) { if (!e.target.closest(".searchbox")) histBox.hidden = true; });
 
     el("filterbar").addEventListener("click", function (e) {
       var c = e.target.closest(".filter-chip"); if (!c) return;
