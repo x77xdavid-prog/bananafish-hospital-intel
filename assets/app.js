@@ -219,6 +219,16 @@
     naver.maps.Event.addListener(map, "zoom_changed", function () { applyMapMode(curMapRecs); });
   }
 
+  // 최신 확인 — 외부 공개 출처(네이버 검색/지도/뉴스/공식 홈페이지)를 새 탭으로 열어 최신 정보 확인
+  function latestLinksHtml(h) {
+    var nm = displayName(h), q = encodeURIComponent(nm + " " + h.gu);
+    function a(href, label) { return '<a href="' + esc(href) + '" target="_blank" rel="noopener" onclick="event.stopPropagation()">' + label + "</a>"; }
+    return '<div class="latest"><span class="latest__label">최신 확인 ↻</span>' +
+      a("https://search.naver.com/search.naver?query=" + q, "검색") +
+      a("https://map.naver.com/p/search/" + encodeURIComponent(nm), "지도") +
+      a("https://search.naver.com/search.naver?where=news&query=" + encodeURIComponent(nm), "뉴스") +
+      (h.url ? a(h.url, "홈페이지") : "") + "</div>";
+  }
   function popupHtml(h) {
     var depts = deptNames(h, 4).join(" · ") || "—";
     var tag = h._deep ? '<span class="pop__tag">심층</span>' : "";
@@ -229,7 +239,7 @@
       '<div class="pop__meta">' + esc(h.cl) + " · " + esc(h.gu) + (h.open ? " · 개원 " + esc(h.open) : "") + "</div>" +
       '<div class="pop__row"><b>진료</b> ' + esc(depts) + "</div>" +
       '<div class="pop__row"><b>의사</b> ' + fmtNum(h.dr) + "명" + (h.tel ? ' · <b>☎</b> ' + esc(h.tel) : "") + "</div>" +
-      '<div class="pop__row" style="color:var(--ink-faint)">' + esc(h.addr) + "</div>" + btn;
+      '<div class="pop__row" style="color:var(--ink-faint)">' + esc(h.addr) + "</div>" + btn + latestLinksHtml(h);
   }
 
   function updateMap(recs) {
@@ -421,7 +431,7 @@
           '<span class="head-index">' + pad2(idx) + "</span>" +
           '<span class="dossier__name">' + esc(displayName(h)) + "</span></div>" +
           '<p class="dossier__tagline">' + esc(d.tagline || (h.cl + " · " + h.gu + " · " + (deptNames(h, 3).join(", ") || ""))) + "</p>" +
-          '<div class="head-chips">' + chips + "</div></div>" +
+          '<div class="head-chips">' + chips + "</div>" + latestLinksHtml(h) + "</div>" +
         '<div class="head-right"><dl class="keyfacts">' + keyfacts + "</dl>" +
           '<span class="chevron" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></span>' + "</div>" +
       "</button>";

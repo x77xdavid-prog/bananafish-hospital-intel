@@ -221,6 +221,12 @@ em { font-style: normal; }
 .region-bubble i { font-family: var(--font-mono); font-style: normal; font-size: .78rem; font-weight: 700; }
 .region-bubble:hover { filter: brightness(1.07); }
 
+/* 최신 확인 링크 (팝업 · 심층 카드) */
+.latest { margin-top: .55rem; display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; font-size: var(--t-xs); }
+.latest__label { font-family: var(--font-mono); font-size: var(--t-2xs); letter-spacing: .05em; color: var(--ink-faint); }
+.latest a { color: var(--accent-deep); border-bottom: 1px solid var(--accent-line); padding: .05rem .15rem; border-radius: 4px; }
+.latest a:hover { background: var(--accent-soft); }
+
 /* leaflet marker (divIcon) */
 .hmk { width: 14px; height: 14px; border-radius: 50%; background: var(--ink-ghost); border: 2px solid #fff; box-shadow: 0 1px 4px oklch(24% 0.04 268 / .4); transition: transform var(--dur-fast); }
 .hmk--deep { width: 18px; height: 18px; background: oklch(53% 0.17 262); box-shadow: 0 2px 8px oklch(53% 0.17 262 / .55); }
