@@ -8,14 +8,14 @@
     if (a.type === "dental") t.add("과목:치과");
     if (a.type === "oriental") t.add("과목:한방");
     if (a.inpatient && Number(a.inpatient) > 0) t.add("입원실");
-    if (a.surgery && a.surgery !== "none") t.add("수술실");
+    if (a.surgery && a.surgery !== "none") t.add("수술실");  // surgery: 'none'|'sedation'|'general' (sedation=계획된 진정도 수술실 기준 적용)
     if (a.radiology === "xray" || a.radiology === "ct") t.add("방사선");
     if (a.radiology === "ct") t.add("방사선:ct");
     if (a.radiology === "dental") t.add("방사선:치과");
     if (a.narcotics) t.add("마약류");
     if (a.regen) t.add("재생의료");
     if (a.building === "existing" || a.situation === "remodel") t.add("리모델링");
-    if (Number(a.floors) >= 2) t.add("다층");
+    if (Number(a.floors) >= 2) t.add("다층");  // 다층 태그는 2층↑(승강기·피난). 난이도 점수 가산은 직통계단 2개소 기준인 3층↑에서만(scoreCase).
     (a.depts || []).forEach(function (d) { if (DEPT_TAG[d]) t.add(DEPT_TAG[d]); });
     return t;
   }
@@ -42,15 +42,17 @@
   function matchCheckpoints(a, items) {
     var active = deriveActiveTags(a);
     return items.filter(function (item) {
-      for (var i = 0; i < item.tags.length; i++) {
-        if (active.has(item.tags[i])) return true;
+      var tags = item.tags || [];
+      for (var i = 0; i < tags.length; i++) {
+        if (active.has(tags[i])) return true;
       }
       return false;
     });
   }
 
   function topConcerns(applied, n) {
-    return applied.filter(function (i) { return i.reject === true; }).slice(0, n || 3);
+    var limit = (n != null) ? n : 3;
+    return applied.filter(function (i) { return i.reject === true; }).slice(0, limit);
   }
 
   var api = { deriveActiveTags: deriveActiveTags, scoreCase: scoreCase,

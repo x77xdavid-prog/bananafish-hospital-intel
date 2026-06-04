@@ -54,7 +54,9 @@ test("difficultyBand: 경계값", () => {
 test("matchCheckpoints: 의원 최소 = always 항목만, 입원실 항목 제외", () => {
   const applied = L.matchCheckpoints(base, CHECKLIST);
   assert.ok(applied.length > 0);
-  assert.ok(applied.every(i => i.tags.includes("always") || false));
+  const alwaysCount = CHECKLIST.filter(i => i.tags.includes("always")).length;
+  assert.strictEqual(applied.length, alwaysCount); // 정확히 always 항목 수만큼만 매칭(누수 없음)
+  assert.ok(applied.every(i => i.tags.includes("always")));
   assert.ok(!applied.some(i => i.id === "F1"));
   assert.ok(!applied.some(i => i.id === "C1"));
 });
@@ -72,4 +74,9 @@ test("topConcerns: reject 항목 우선, 최대 n개", () => {
   const top = L.topConcerns(applied, 3);
   assert.strictEqual(top.length, 3);
   assert.ok(top.every(i => i.reject === true));
+});
+
+test("deriveActiveTags: situation=remodel 단독으로도 리모델링 활성", () => {
+  const t = L.deriveActiveTags({ ...base, situation:"remodel" }); // building 'new'
+  assert.ok(t.has("리모델링"));
 });
