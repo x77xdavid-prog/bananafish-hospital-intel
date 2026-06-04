@@ -51,15 +51,20 @@
   /* ---------- state ---------- */
   var state = { q: "", sidos: {}, types: {}, era: "all", sort: "name", page: 1 };
   var PAGE_SIZE = 50;
+  // 검색어 토큰(공백 분리, AND 매칭) — refresh() 시점에 1회 계산
+  var qTokens = [];
 
   // 검색 인덱스 캐시
   HOSP.forEach(function (h) {
     h._s = (h.name + " " + h.addr + " " + h.gu + " " + deptNames(h).join(" ")).toLowerCase();
     h._deep = !!DEEP[h.id];
+    h._dn = displayName(h); // 정렬키 = 화면 표시명(접두 제거/심층 오버라이드 반영)
   });
 
   function matches(h) {
-    if (state.q && h._s.indexOf(state.q) === -1) return false;
+    for (var qi = 0; qi < qTokens.length; qi++) {
+      if (h._s.indexOf(qTokens[qi]) === -1) return false;
+    }
     if (hasKeys(state.sidos) && !state.sidos[h.sido]) return false;
     if (hasKeys(state.types) && !state.types[h.cl]) return false;
     if (state.era !== "all") {
@@ -80,8 +85,8 @@
   function sortRecs(recs) {
     var s = state.sort;
     var c = recs.slice();
-    if (s === "name") c.sort(function (a, b) { return a.name.localeCompare(b.name, "ko"); });
-    else if (s === "dr_desc") c.sort(function (a, b) { return (b.dr - a.dr) || a.name.localeCompare(b.name, "ko"); });
+    if (s === "name") c.sort(function (a, b) { return a._dn.localeCompare(b._dn, "ko"); });
+    else if (s === "dr_desc") c.sort(function (a, b) { return (b.dr - a.dr) || a._dn.localeCompare(b._dn, "ko"); });
     else if (s === "open_desc") c.sort(function (a, b) { return cmpOpen(b.open, a.open); });
     else if (s === "open_asc") c.sort(function (a, b) { return cmpOpen(a.open, b.open); });
     return c;
@@ -493,6 +498,7 @@
 
   function refresh(resetPage) {
     if (resetPage) state.page = 1;
+    qTokens = state.q ? state.q.split(/\s+/).filter(Boolean) : [];
     renderDirectory();
     // deep: re-render under filter
     el("deepList").innerHTML = "";
