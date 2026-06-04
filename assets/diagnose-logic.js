@@ -39,7 +39,22 @@
     return { stars:4, label:"까다로움" };
   }
 
-  var api = { deriveActiveTags: deriveActiveTags, scoreCase: scoreCase, difficultyBand: difficultyBand };
+  function matchCheckpoints(a, items) {
+    var active = deriveActiveTags(a);
+    return items.filter(function (item) {
+      for (var i = 0; i < item.tags.length; i++) {
+        if (active.has(item.tags[i])) return true;
+      }
+      return false;
+    });
+  }
+
+  function topConcerns(applied, n) {
+    return applied.filter(function (i) { return i.reject === true; }).slice(0, n || 3);
+  }
+
+  var api = { deriveActiveTags: deriveActiveTags, scoreCase: scoreCase,
+    difficultyBand: difficultyBand, matchCheckpoints: matchCheckpoints, topConcerns: topConcerns };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   global.DiagLogic = api;
 })(typeof window !== "undefined" ? window : globalThis);

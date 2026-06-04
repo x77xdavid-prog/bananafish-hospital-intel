@@ -1,6 +1,7 @@
 const test = require("node:test");
 const assert = require("node:assert");
 const L = require("../assets/diagnose-logic.js");
+const { CHECKLIST } = require("../assets/checklist-data.js");
 
 const base = { situation:"new", type:"clinic", depts:[], inpatient:0,
   surgery:"none", radiology:"none", narcotics:false, regen:false, building:"new", floors:1, region:"" };
@@ -48,4 +49,27 @@ test("difficultyBand: 경계값", () => {
   assert.deepStrictEqual(L.difficultyBand(3), { stars:3, label:"주의" });
   assert.deepStrictEqual(L.difficultyBand(4), { stars:3, label:"주의" });
   assert.deepStrictEqual(L.difficultyBand(5), { stars:4, label:"까다로움" });
+});
+
+test("matchCheckpoints: 의원 최소 = always 항목만, 입원실 항목 제외", () => {
+  const applied = L.matchCheckpoints(base, CHECKLIST);
+  assert.ok(applied.length > 0);
+  assert.ok(applied.every(i => i.tags.includes("always") || false));
+  assert.ok(!applied.some(i => i.id === "F1"));
+  assert.ok(!applied.some(i => i.id === "C1"));
+});
+
+test("matchCheckpoints: 입원실 → F·H1 포함, 의원 최소보다 많음", () => {
+  const min = L.matchCheckpoints(base, CHECKLIST).length;
+  const applied = L.matchCheckpoints({ ...base, inpatient:8 }, CHECKLIST);
+  assert.ok(applied.some(i => i.id === "F1"));
+  assert.ok(applied.some(i => i.id === "H1"));
+  assert.ok(applied.length > min);
+});
+
+test("topConcerns: reject 항목 우선, 최대 n개", () => {
+  const applied = L.matchCheckpoints({ ...base, inpatient:8, radiology:"ct", narcotics:true }, CHECKLIST);
+  const top = L.topConcerns(applied, 3);
+  assert.strictEqual(top.length, 3);
+  assert.ok(top.every(i => i.reject === true));
 });
