@@ -270,7 +270,8 @@
     var btn = h._deep
       ? '<a class="pop__btn" href="#deep-' + h.id + '" data-deepgo="' + h.id + '">심층 도시에 보기 →</a>'
       : (h.url ? '<a class="pop__btn" href="' + esc(h.url) + '" target="_blank" rel="noopener">홈페이지 →</a>' : "");
-    return '<div class="pop__name">' + esc(displayName(h)) + tag + "</div>" +
+    return '<button type="button" class="pop__close" aria-label="닫기">×</button>' +
+      '<div class="pop__name">' + esc(displayName(h)) + tag + "</div>" +
       '<div class="pop__meta">' + esc(h.cl) + " · " + esc(h.gu) + (h.open ? " · 개원 " + esc(h.open) : "") + "</div>" +
       '<div class="pop__row"><b>진료</b> ' + esc(depts) + "</div>" +
       '<div class="pop__row"><b>의사</b> ' + fmtNum(h.dr) + "명" + (h.tel ? ' · <b>☎</b> ' + esc(h.tel) : "") + "</div>" +
@@ -548,6 +549,13 @@
     document.addEventListener("click", function (e) {
       var a = e.target.closest("[data-deepgo]"); if (!a) return;
       e.preventDefault(); gotoDeep(a.dataset.deepgo);
+    });
+
+    // popup 닫기(×)
+    document.addEventListener("click", function (e) {
+      if (!e.target.closest(".pop__close")) return;
+      e.preventDefault(); e.stopPropagation();
+      if (infoWindow) infoWindow.close();
     });
 
     // to-top
