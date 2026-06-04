@@ -13,11 +13,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap" />
 
-  <!-- Leaflet + MarkerCluster (오픈소스 지도, 카피·변형 자유) -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+  <!-- NAVER 지도(Dynamic Map)는 별도 CSS 불필요 -->
 
   <link rel="stylesheet" href="assets/styles.css" />
 </head>
@@ -102,7 +98,7 @@
       </span>
     </div>
     <div id="map" class="map" role="application" aria-label="병원 위치 지도(Leaflet)"></div>
-    <p class="map-note">지도 타일 © <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a> · 데이터 © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> · 병원 위치 © 건강보험심사평가원</p>
+    <p class="map-note">지도 © NAVER · 병원 위치 데이터 © 건강보험심사평가원</p>
   </section>
 
   <!-- ============ DEEP DOSSIERS ============ -->
@@ -170,14 +166,13 @@
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
   </button>
 
-  <!-- Leaflet JS -->
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-          integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+  <!-- NAVER Maps (Dynamic Map) + 클러스터링 헬퍼 -->
+  <script src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=4k5etn1d10"></script>
+  <script src="assets/marker-clustering.js?v=n1"></script>
 
   <!-- data first, then deep, then renderer -->
-  <script src="assets/data.js"></script>
-  <script src="assets/deep.js"></script>
-  <script src="assets/app.js"></script>
+  <script src="assets/data.js?v=n1"></script>
+  <script src="assets/deep.js?v=n1"></script>
+  <script src="assets/app.js?v=n1"></script>
 </body>
 </html>

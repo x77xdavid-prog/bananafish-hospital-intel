@@ -116,30 +116,52 @@
     var c = {}; HOSP.forEach(function (h) { c[h[field]] = (c[h[field]] || 0) + 1; }); return c;
   }
 
-  /* ---------- map ---------- */
-  var map, cluster, markerById = {};
+  /* ---------- map (NAVER Dynamic Map) ---------- */
+  var map, clusterer, markerById = {}, infoWindow;
+  function clusterIcon(cls, px) {
+    return { content: '<div class="navclust ' + cls + '"><span>0</span></div>',
+             size: new naver.maps.Size(px, px), anchor: new naver.maps.Point(px / 2, px / 2) };
+  }
+  function openInfo(h, m) {
+    infoWindow.setContent('<div class="navpop">' + popupHtml(h) + "</div>");
+    infoWindow.open(map, m);
+  }
   function initMap() {
-    map = L.map("map", { scrollWheelZoom: true, zoomControl: true }).setView([37.49, 127.04], 12);
-    L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
-      subdomains: "abcd", maxZoom: 19
-    }).addTo(map);
-
-    cluster = L.markerClusterGroup({
-      chunkedLoading: true, maxClusterRadius: 52, spiderfyOnMaxZoom: true, showCoverageOnHover: false
+    map = new naver.maps.Map("map", {
+      center: new naver.maps.LatLng(37.515, 127.03),
+      zoom: 12, minZoom: 9,
+      scaleControl: true, mapDataControl: false, logoControl: true,
+      zoomControl: true, zoomControlOptions: { position: naver.maps.Position.RIGHT_TOP }
     });
+    infoWindow = new naver.maps.InfoWindow({
+      content: "", borderWidth: 0, disableAnchor: true,
+      backgroundColor: "transparent", pixelOffset: new naver.maps.Point(0, -4)
+    });
+    naver.maps.Event.addListener(map, "click", function () { infoWindow.close(); });
+
     HOSP.forEach(function (h) {
-      var deep = h._deep;
-      var icon = L.divIcon({
-        className: "", html: '<div class="hmk' + (deep ? " hmk--deep" : "") + '"></div>',
-        iconSize: deep ? [18, 18] : [14, 14], iconAnchor: deep ? [9, 9] : [7, 7]
+      var deep = h._deep, sz = deep ? 18 : 14;
+      var m = new naver.maps.Marker({
+        position: new naver.maps.LatLng(h.lat, h.lng), title: h.name,
+        icon: { content: '<div class="hmk' + (deep ? " hmk--deep" : "") + '"></div>',
+                anchor: new naver.maps.Point(sz / 2, sz / 2) },
+        zIndex: deep ? 100 : 50
       });
-      var m = L.marker([h.lat, h.lng], { icon: icon, title: h.name });
-      m.bindPopup(popupHtml(h), { minWidth: 220, maxWidth: 280 });
-      m._hid = h.id;
+      naver.maps.Event.addListener(m, "click", (function (hh, mm) {
+        return function () { openInfo(hh, mm); };
+      })(h, m));
       markerById[h.id] = m;
     });
-    map.addLayer(cluster);
+
+    clusterer = new MarkerClustering({
+      map: map, markers: [], disableClickZoom: false,
+      minClusterSize: 2, maxZoom: 15, gridSize: 120, averageCenter: true,
+      icons: [clusterIcon("c1", 38), clusterIcon("c2", 44), clusterIcon("c3", 52), clusterIcon("c4", 62)],
+      indexGenerator: [10, 50, 200, 1000],
+      stylingFunction: function (cm, count) {
+        var s = cm.getElement().querySelector("span"); if (s) s.textContent = count;
+      }
+    });
   }
 
   function popupHtml(h) {
@@ -156,11 +178,10 @@
   }
 
   function updateMap(recs) {
-    if (!cluster) return;
-    cluster.clearLayers();
+    if (!clusterer) return;
     var ms = [];
     for (var i = 0; i < recs.length; i++) { var m = markerById[recs[i].id]; if (m) ms.push(m); }
-    cluster.addLayers(ms);
+    clusterer.setMarkers(ms);
     el("mapCount").textContent = fmtNum(recs.length);
   }
 
@@ -168,7 +189,9 @@
     var m = markerById[h.id];
     if (!m || !map) return;
     document.querySelector(".mapsection").scrollIntoView({ behavior: "smooth", block: "start" });
-    cluster.zoomToShowLayer(m, function () { m.openPopup(); });
+    map.setCenter(m.getPosition());
+    map.setZoom(17);
+    setTimeout(function () { openInfo(h, m); }, 320);
   }
 
   /* ---------- directory ---------- */

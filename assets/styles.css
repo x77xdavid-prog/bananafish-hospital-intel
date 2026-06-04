@@ -206,6 +206,15 @@ em { font-style: normal; }
 .map-note { font-size: var(--t-2xs); color: var(--ink-ghost); margin-top: .5rem; }
 .map-note a { color: var(--ink-faint); border-bottom: 1px dotted var(--line-strong); }
 
+/* NAVER 지도 — 팝업(InfoWindow) + 클러스터 */
+.navpop { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-md); box-shadow: var(--shadow-pop); padding: .85rem 1rem; min-width: 220px; max-width: 280px; font-family: var(--font-sans); line-height: 1.5; }
+.navclust { display: grid; place-items: center; border-radius: 50%; color: #fff; font-family: var(--font-mono); font-weight: 700; cursor: pointer; font-variant-numeric: tabular-nums; background: oklch(47% 0.155 264 / .92); border: 3px solid oklch(47% 0.155 264 / .3); box-shadow: 0 4px 14px -4px oklch(47% 0.155 264 / .6); transition: transform var(--dur-fast); }
+.navclust:hover { transform: scale(1.08); }
+.navclust.c1 { width: 38px; height: 38px; font-size: .74rem; }
+.navclust.c2 { width: 44px; height: 44px; font-size: .8rem; }
+.navclust.c3 { width: 52px; height: 52px; font-size: .86rem; background: oklch(44% 0.17 264 / .93); }
+.navclust.c4 { width: 62px; height: 62px; font-size: .95rem; background: oklch(40% 0.18 264 / .94); }
+
 /* leaflet marker (divIcon) */
 .hmk { width: 14px; height: 14px; border-radius: 50%; background: var(--ink-ghost); border: 2px solid #fff; box-shadow: 0 1px 4px oklch(24% 0.04 268 / .4); transition: transform var(--dur-fast); }
 .hmk--deep { width: 18px; height: 18px; background: var(--accent); box-shadow: 0 2px 8px oklch(47% 0.155 264 / .5); }
