@@ -36,12 +36,12 @@
     .hero__cta{display:inline-flex; align-items:center; gap:.45rem; margin-top:26px; background:#fff; color:var(--blue-deep); font-weight:800; text-decoration:none; padding:.85rem 1.6rem; border-radius:999px; transition:transform .15s ease;}
     .hero__cta:hover{transform:translateY(-2px);}
 
-    .flow{display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-top:18px;}
+    .flow{display:grid; grid-template-columns:repeat(4,1fr); gap:24px; margin-top:18px;}
     .flow .step{background:var(--surface); border:1px solid var(--line); border-radius:var(--r-sm); padding:16px 14px; position:relative;}
     .flow .step b{display:block; font-size:.95rem; color:var(--ink); margin-bottom:.2rem;}
     .flow .step span{font-size:.8rem; color:var(--ink-faint);}
     .flow .step i{position:absolute; top:10px; right:12px; font-size:.7rem; font-weight:800; color:var(--blue-line);}
-    .flow .step:not(:last-child)::after{content:"→"; position:absolute; right:-9px; top:50%; transform:translateY(-50%); color:var(--blue); font-weight:800; z-index:1;}
+    .flow .step:not(:last-child)::after{content:"→"; position:absolute; right:-12px; top:50%; transform:translate(50%,-50%); color:var(--blue); font-weight:800; font-size:.9rem; line-height:1; z-index:1;}
     .flow .step.final{background:linear-gradient(180deg,#fff,var(--blue-soft)); border-color:var(--blue-line);}
     @media (max-width:680px){ .flow{grid-template-columns:repeat(2,1fr);} .flow .step:not(:last-child)::after{display:none;} }
 
