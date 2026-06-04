@@ -15,7 +15,7 @@
 
   <!-- NAVER 지도(Dynamic Map)는 별도 CSS 불필요 -->
 
-  <link rel="stylesheet" href="assets/styles.css?v=n11" />
+  <link rel="stylesheet" href="assets/styles.css?v=n12" />
 </head>
 <body>
   <!-- ============ MASTHEAD ============ -->
@@ -129,6 +129,17 @@
     </div>
   </section>
 
+  <!-- ============ REVIEWS (고객 후기 슬라이드) ============ -->
+  <section class="shell reviews" aria-label="고객 후기">
+    <div class="section-head">
+      <span class="section-label">고객 후기 <span class="section-label__count">★★★★★</span></span>
+      <span class="directory__legend">개원·이전·증축을 함께한 고객 후기</span>
+    </div>
+    <div class="rv-marquee">
+      <div class="rv-track" id="rvTrack"></div>
+    </div>
+  </section>
+
   <!-- ============ FOOTER ============ -->
   <footer class="footer" role="contentinfo">
     <div class="shell footer__inner">
@@ -156,6 +167,30 @@
   <!-- data first, then deep, then renderer -->
   <script src="assets/data.js?v=n6"></script>
   <script src="assets/deep.js?v=n1"></script>
-  <script src="assets/app.js?v=n7"></script>
+  <script src="assets/app.js?v=n8"></script>
+
+  <!-- 고객 후기 슬라이드 (샘플 데이터 · 추후 실제 후기로 교체) -->
+  <script>
+  (function(){
+    var R=[
+      ["김","연세365내과의원","개원 인허가가 막막했는데 도면 작도부터 보건소 통과까지 한 번에 해결됐어요. 일정도 약속대로였습니다."],
+      ["박","강남밝은미소치과의원","셀프 진단으로 뭐가 문제인지 바로 보였고, 차폐·동선까지 꼼꼼히 챙겨주셔서 반려 없이 통과했습니다."],
+      ["이","서울튼튼정형외과의원","물리치료실 구획과 장애인 편의시설 기준을 미리 잡아줘서 재시공이 없었어요. 강력 추천합니다."],
+      ["최","새봄여성의원","분만실·신생아실 기준이 복잡했는데 법규 검토가 정확해 안심하고 개원했습니다."],
+      ["정","행복드림소아청소년과의원","첫 개원이라 막막했는데 60초 진단 후 상담이 빨라서 좋았어요. 응대도 친절합니다."],
+      ["한","우리들이비인후과의원","수술실 CCTV·회복실 기준까지 빠짐없이 반영해 주셔서 한 번에 허가 났습니다."],
+      ["윤","참편한정신건강의학과의원","격리실·안전 마감 등 까다로운 부분을 명확히 안내받아 큰 도움이 됐습니다."],
+      ["서","굿모닝안과의원","도면 수정이 빠르고 관할 협의까지 대응해 주셔서 오픈 일정을 정확히 맞췄습니다."]
+    ];
+    function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c];});}
+    function card(r){
+      return '<figure class="rv-card"><div class="rv-stars" aria-label="별 5개">★★★★★</div>'
+        + '<blockquote class="rv-text">'+esc(r[2])+'</blockquote>'
+        + '<figcaption class="rv-who"><b>'+esc(r[0])+'○○</b> · '+esc(r[1])+'</figcaption></figure>';
+    }
+    var t=document.getElementById("rvTrack");
+    if(t){ var h=R.map(card).join(""); t.innerHTML=h+h; }
+  })();
+  </script>
 </body>
 </html>
