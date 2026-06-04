@@ -530,3 +530,10 @@ body::before{ content:""; position:fixed; inset:0; z-index:-1; pointer-events:no
 .rv-who{ font-size:.82rem; color:var(--ink-faint); }
 .rv-who b{ color:var(--ink); font-weight:700; }
 @media (prefers-reduced-motion: reduce){ .rv-track{ animation:none; } .rv-marquee{ overflow-x:auto; -webkit-mask-image:none; mask-image:none; } }
+
+/* ---- 인터랙티브 배경 블롭(메인) ---- */
+html, body { overflow-x: hidden; }
+.fx-blob{ position:fixed; z-index:-1; border-radius:50%; filter:blur(70px); opacity:0; pointer-events:none; will-change:transform; }
+.fx-blob.f1{ width:380px; height:380px; background:oklch(72% 0.16 250); top:-90px; left:-70px; }
+.fx-blob.f2{ width:330px; height:330px; background:oklch(74% 0.13 170); top:42%; right:-90px; }
+.fx-blob.f3{ width:320px; height:320px; background:oklch(72% 0.17 320); bottom:-110px; left:34%; }
