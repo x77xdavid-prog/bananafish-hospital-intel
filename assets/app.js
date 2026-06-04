@@ -182,6 +182,8 @@
     var ms = [];
     for (var i = 0; i < recs.length; i++) { var m = markerById[recs[i].id]; if (m) ms.push(m); }
     clusterer.setMarkers(ms);
+    // MarkerClustering의 KVO가 'markers' 변경을 redraw하지 않으므로 idle을 강제 트리거
+    if (map) naver.maps.Event.trigger(map, "idle");
     el("mapCount").textContent = fmtNum(recs.length);
   }
 
