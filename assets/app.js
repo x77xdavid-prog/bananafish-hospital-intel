@@ -50,7 +50,7 @@
 
   /* ---------- state ---------- */
   var state = { q: "", sidos: {}, types: {}, era: "all", sort: "name", page: 1 };
-  var PAGE_SIZE = 20;
+  var PAGE_SIZE = 15;
   // 검색어 토큰(공백 분리, AND 매칭) — refresh() 시점에 1회 계산
   var qTokens = [];
 
