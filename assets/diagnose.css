@@ -12,13 +12,13 @@
 }
 
 /* ---- page atmosphere (라이트 + 은은한 파스텔 워시) ---- */
-body{ background:var(--dg-bg); color:var(--dg-ink); word-break:keep-all; }
+body{ background:var(--dg-bg); color:var(--dg-ink); word-break:keep-all; overflow-x:hidden; }
 .dg-bg{position:fixed; inset:0; z-index:-2; pointer-events:none; background:
   radial-gradient(40% 32% at 12% 4%, rgba(41,151,255,.16), transparent 60%),
   radial-gradient(36% 30% at 90% 6%, rgba(56,201,168,.13), transparent 62%),
   radial-gradient(46% 38% at 84% 98%, rgba(155,123,255,.13), transparent 60%),
   radial-gradient(40% 30% at 6% 98%, rgba(255,158,122,.11), transparent 60%);}
-.dg-blob{position:fixed; z-index:-1; border-radius:50%; filter:blur(72px); opacity:.28; pointer-events:none; animation:dgfloat 17s ease-in-out infinite;}
+.dg-blob{position:fixed; z-index:-1; border-radius:50%; filter:blur(72px); opacity:.28; pointer-events:none; will-change:transform;}
 .dg-blob.b1{width:340px;height:340px; background:var(--dg-blue); top:-80px; left:-60px;}
 .dg-blob.b2{width:300px;height:300px; background:var(--dg-mint); top:46%; right:-80px; animation-delay:-7s;}
 .dg-blob.b3{width:280px;height:280px; background:var(--dg-violet); bottom:-90px; left:36%; animation-delay:-11s;}

@@ -15,9 +15,11 @@
 
   <!-- NAVER 지도(Dynamic Map)는 별도 CSS 불필요 -->
 
-  <link rel="stylesheet" href="assets/styles.css?v=n12" />
+  <link rel="stylesheet" href="assets/styles.css?v=n13" />
 </head>
-<body>
+<body data-fx-opacity="0.3">
+  <div class="fx-blob f1"></div><div class="fx-blob f2"></div><div class="fx-blob f3"></div>
+
   <!-- ============ MASTHEAD ============ -->
   <header class="masthead" role="banner">
     <div class="shell">
@@ -192,5 +194,6 @@
     if(t){ var h=R.map(card).join(""); t.innerHTML=h+h; }
   })();
   </script>
+  <script src="assets/bg-fx.js?v=1"></script>
 </body>
 </html>
