@@ -1,0 +1,33 @@
+/* 병원인텔리전스/assets/diagnose.css */
+.dg { max-width: 720px; margin: 0 auto; padding: 2rem 0 5rem; }
+.dg-hero { text-align: center; padding: 3rem 1rem; }
+.dg-hero__title { font-size: clamp(1.8rem, 1rem + 4vw, 3rem); line-height: 1.15; margin: 0 0 .8rem; }
+.dg-hero__sub { color: #4b5563; font-size: 1.05rem; margin: 0 0 1.6rem; }
+.dg-hero__anchor { margin-top: 1.2rem; font-size: .8rem; color: #6b7280; }
+.dg-btn { border: 0; border-radius: 10px; padding: .85rem 1.6rem; font: inherit; font-weight: 600;
+  cursor: pointer; transition: transform var(--duration-fast,150ms) ease, opacity 150ms ease; }
+.dg-btn:active { transform: scale(.97); }
+.dg-btn--primary { background: #344e9b; color: #fff; }
+.dg-btn--ghost { background: transparent; color: #344e9b; }
+.dg-btn:disabled { opacity: .4; cursor: default; }
+.dg-progress { height: 6px; background: #e5e7eb; border-radius: 3px; overflow: hidden; margin-bottom: 1.5rem; }
+.dg-progress__bar { display: block; height: 100%; width: 0; background: #344e9b; transition: width 250ms ease; }
+.dg-step__q { font-size: 1.25rem; font-weight: 600; margin: 0 0 1.2rem; }
+.dg-opt { display: block; width: 100%; text-align: left; padding: .9rem 1rem; margin: .5rem 0;
+  border: 1.5px solid #d1d5db; border-radius: 10px; background: #fff; font: inherit; cursor: pointer;
+  transition: border-color 150ms ease, background 150ms ease; }
+.dg-opt:hover { border-color: #344e9b; }
+.dg-opt[aria-pressed="true"] { border-color: #344e9b; background: #eef2ff; font-weight: 600; }
+.dg-nav { display: flex; justify-content: space-between; margin-top: 1.5rem; }
+.dg-result__grade { font-size: 2rem; font-weight: 700; text-align: center; margin: 1rem 0; }
+.dg-result__count { text-align: center; color: #344e9b; font-weight: 600; font-size: 1.2rem; }
+.dg-top { margin: 1.5rem 0; padding: 1rem 1.2rem; background: #fff7ed; border: 1px solid #fed7aa; border-radius: 12px; }
+.dg-top h3 { margin: 0 0 .6rem; font-size: 1rem; }
+.dg-top ul { margin: 0; padding-left: 1.1rem; }
+.dg-gate { margin-top: 2rem; padding: 1.5rem; background: #f9fafb; border-radius: 14px; }
+.dg-gate label { display: block; font-size: .85rem; font-weight: 600; margin: .8rem 0 .3rem; }
+.dg-gate input[type=text], .dg-gate input[type=tel], .dg-gate input[type=email] {
+  width: 100%; padding: .7rem .8rem; border: 1.5px solid #d1d5db; border-radius: 8px; font: inherit; }
+.dg-gate__consent { display: flex; gap: .5rem; align-items: flex-start; margin: 1rem 0; font-size: .8rem; color: #4b5563; }
+.dg-disclaimer { margin-top: 1rem; font-size: .75rem; color: #9ca3af; text-align: center; }
+@media (prefers-reduced-motion: reduce) { .dg-btn, .dg-progress__bar { transition: none; } }
