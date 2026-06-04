@@ -1,0 +1,10 @@
+# 데이터 생성용 원본(대용량) — 배포 불필요, opendata.hira에서 재다운로드 가능
+build/raw/
+# 파이썬 캐시
+**/__pycache__/
+*.pyc
+# 로컬 테스트 산출물
+.playwright-mcp/
+*.png
+.DS_Store
+Thumbs.db
