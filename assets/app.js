@@ -268,7 +268,7 @@
     var depts = deptNames(h, 4).join(" · ") || "—";
     var tag = h._deep ? '<span class="pop__tag">심층</span>' : "";
     var btn = h._deep
-      ? '<a class="pop__btn" href="#deep-' + h.id + '" data-deepgo="' + h.id + '">심층 도시에 보기 →</a>'
+      ? '<a class="pop__btn" href="#deep-' + h.id + '" data-deepgo="' + h.id + '">자세히 보기 →</a>'
       : (h.url ? '<a class="pop__btn" href="' + esc(h.url) + '" target="_blank" rel="noopener">홈페이지 →</a>' : "");
     return '<button type="button" class="pop__close" aria-label="닫기">×</button>' +
       '<div class="pop__name">' + esc(displayName(h)) + tag + "</div>" +
@@ -375,7 +375,7 @@
     });
     var host = el("deepList");
     if (!ids.length) {
-      host.innerHTML = '<p class="empty-state">심층 도시에는 순차적으로 추가됩니다.</p>';
+      host.innerHTML = '<p class="empty-state">심층 분석은 순차적으로 추가됩니다.</p>';
       return;
     }
     var n = 0;
@@ -385,7 +385,7 @@
       n++;
       host.appendChild(deepCard(h, d, n));
     });
-    if (!n) host.innerHTML = '<p class="empty-state">현재 필터에 해당하는 심층 도시에가 없습니다.</p>';
+    if (!n) host.innerHTML = '<p class="empty-state">현재 필터에 해당하는 심층 분석이 없습니다.</p>';
   }
 
   function deepCard(h, d, idx) {
