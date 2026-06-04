@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>바나나피쉬 병원 인텔리전스 — 소개 (Glass)</title>
+  <meta name="description" content="내 주변 개원 병원 지도 → 검색·정보 → 60초 진단 → 법규에 맞는 도면을 가장 빠르게. 바나나피쉬 병원 인텔리전스." />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23344e9b'/%3E%3Cpath d='M16 7v18M7 16h18' stroke='white' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&display=swap" />
+  <style>
+    :root{
+      --txt:#eef2ff; --txt-soft:#c2cdf2; --txt-faint:#94a2d6;
+      --blue:#5b8cff; --cyan:#43e3ff; --violet:#9d7bff;
+      --glass:rgba(255,255,255,.08); --glass-2:rgba(255,255,255,.12);
+      --stroke:rgba(255,255,255,.18); --stroke-2:rgba(255,255,255,.30);
+      --r:22px; --r-sm:14px;
+      --display:"Sora","Pretendard Variable",sans-serif;
+      --body:"Pretendard Variable",Pretendard,-apple-system,system-ui,"Malgun Gothic",sans-serif;
+    }
+    *,*::before,*::after{box-sizing:border-box;}
+    html{scroll-behavior:smooth;}
+    body{
+      margin:0; font-family:var(--body); color:var(--txt); line-height:1.65;
+      background:#070b1f; overflow-x:hidden; -webkit-font-smoothing:antialiased;
+    }
+    /* atmosphere: deep blue field + glowing blobs behind glass */
+    .bg{position:fixed; inset:0; z-index:-2; background:
+      radial-gradient(60% 50% at 12% 8%, rgba(91,140,255,.45), transparent 60%),
+      radial-gradient(50% 45% at 88% 12%, rgba(67,227,255,.30), transparent 62%),
+      radial-gradient(60% 55% at 78% 92%, rgba(157,123,255,.40), transparent 60%),
+      linear-gradient(165deg,#0a1030 0%, #0b1538 55%, #0a1230 100%);}
+    .blob{position:fixed; z-index:-1; border-radius:50%; filter:blur(60px); opacity:.55; animation:float 14s ease-in-out infinite;}
+    .blob.b1{width:380px;height:380px; background:#3a6bff; top:-60px; left:-40px;}
+    .blob.b2{width:320px;height:320px; background:#26cfe0; top:40%; right:-60px; animation-delay:-5s;}
+    .blob.b3{width:300px;height:300px; background:#8a5bff; bottom:-80px; left:30%; animation-delay:-9s;}
+    @keyframes float{0%,100%{transform:translateY(0) scale(1);}50%{transform:translateY(-26px) scale(1.06);}}
+
+    .wrap{max-width:920px; margin:0 auto; padding:0 20px 90px;}
+    .brand{display:inline-flex; align-items:center; gap:.55rem; margin-top:40px;}
+    .brand__tag{font-family:var(--display); background:linear-gradient(135deg,#5b8cff,#43e3ff); color:#06122e; font-weight:800; font-size:.72rem; letter-spacing:.06em; padding:.34rem .62rem; border-radius:8px;}
+    .brand__sub{font-size:.8rem; color:var(--txt-faint); letter-spacing:.02em;}
+
+    .glass{background:var(--glass); -webkit-backdrop-filter:blur(20px) saturate(150%); backdrop-filter:blur(20px) saturate(150%); border:1px solid var(--stroke); border-radius:var(--r); box-shadow:0 24px 60px -28px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.28);}
+
+    .reveal{opacity:0; transform:translateY(16px); animation:rise .7s cubic-bezier(.2,.7,.2,1) forwards;}
+    @keyframes rise{to{opacity:1; transform:none;}}
+
+    .hero{margin-top:26px; padding:42px 36px; position:relative; overflow:hidden;}
+    .hero::before{content:""; position:absolute; top:-40%; right:-10%; width:340px; height:340px; background:radial-gradient(circle,rgba(67,227,255,.5),transparent 65%); filter:blur(10px); pointer-events:none;}
+    .hero h1{font-family:var(--display); margin:0 0 .6rem; font-size:clamp(1.9rem,1.1rem+3vw,3rem); line-height:1.14; letter-spacing:-.02em; position:relative;}
+    .hero h1 .grad{background:linear-gradient(110deg,#9fd0ff,#43e3ff 60%,#b69bff); -webkit-background-clip:text; background-clip:text; color:transparent;}
+    .hero p{margin:0; color:var(--txt-soft); font-size:1.06rem; max-width:60ch;}
+    .hero__stat{display:flex; gap:14px; margin-top:24px; flex-wrap:wrap;}
+    .pill{flex:1 1 140px; padding:14px 16px; border-radius:var(--r-sm); background:var(--glass-2); border:1px solid var(--stroke); text-align:center;}
+    .pill b{display:block; font-family:var(--display); font-size:1.6rem; letter-spacing:-.02em; background:linear-gradient(120deg,#7fb0ff,#43e3ff); -webkit-background-clip:text; background-clip:text; color:transparent;}
+    .pill span{font-size:.78rem; color:var(--txt-faint);}
+    .hero__cta{display:inline-flex; align-items:center; gap:.5rem; margin-top:26px; font-weight:800; text-decoration:none; color:#06122e;
+      background:linear-gradient(135deg,#7fb6ff,#43e3ff); padding:.9rem 1.7rem; border-radius:999px;
+      box-shadow:0 12px 30px -10px rgba(67,227,255,.7), inset 0 1px 0 rgba(255,255,255,.6); transition:transform .18s ease, box-shadow .18s ease;}
+    .hero__cta:hover{transform:translateY(-3px); box-shadow:0 18px 40px -10px rgba(67,227,255,.85);}
+
+    h2.sec{font-family:var(--display); font-size:1.05rem; margin:46px 0 16px; letter-spacing:.01em; color:var(--txt); display:flex; align-items:center; gap:.55rem; text-transform:uppercase;}
+    h2.sec::before{content:""; width:22px; height:3px; border-radius:2px; background:linear-gradient(90deg,#5b8cff,#43e3ff);}
+
+    .flow{display:grid; grid-template-columns:repeat(4,1fr); gap:26px;}
+    .flow .step{padding:18px 16px; position:relative;}
+    .flow .step b{display:block; font-family:var(--display); font-size:.98rem; margin-bottom:.25rem;}
+    .flow .step span{font-size:.8rem; color:var(--txt-faint);}
+    .flow .step i{position:absolute; top:12px; right:14px; font-family:var(--display); font-size:.72rem; font-weight:800; color:rgba(255,255,255,.3);}
+    .flow .step:not(:last-child)::after{content:"→"; position:absolute; right:-15px; top:50%; transform:translate(50%,-50%); color:var(--cyan); font-weight:800; font-size:1rem; line-height:1; text-shadow:0 0 12px rgba(67,227,255,.8);}
+    .flow .step.final{background:linear-gradient(180deg,rgba(67,227,255,.16),var(--glass)); border-color:var(--stroke-2);}
+
+    .cards{display:grid; grid-template-columns:repeat(auto-fit,minmax(238px,1fr)); gap:16px;}
+    .card{padding:22px;}
+    .card h3{font-family:var(--display); margin:0 0 .45rem; font-size:1rem; display:flex; align-items:center; gap:.45rem;}
+    .card p{margin:0; font-size:.9rem; color:var(--txt-soft);}
+    .num{display:inline-flex; align-items:center; justify-content:center; width:24px; height:24px; border-radius:50%; background:linear-gradient(135deg,#5b8cff,#43e3ff); color:#06122e; font-size:.78rem; font-weight:800; flex:none;}
+    .card.star{grid-column:1/-1; background:linear-gradient(135deg,rgba(91,140,255,.18),rgba(67,227,255,.10)); border-color:var(--stroke-2);}
+    .card.star .badge{display:inline-block; margin-bottom:.6rem; font-family:var(--display); background:linear-gradient(135deg,#5b8cff,#43e3ff); color:#06122e; font-size:.66rem; font-weight:800; padding:.24rem .56rem; border-radius:7px; letter-spacing:.03em;}
+    .card.star ul{margin:.5rem 0 0; padding-left:1.1rem; columns:2; column-gap:1.4rem; font-size:.9rem; color:var(--txt-soft);}
+    .card.star li{margin:.3rem 0; break-inside:avoid;}
+
+    .value{padding:6px 24px;}
+    .value li{list-style:none; padding:15px 0; border-bottom:1px solid rgba(255,255,255,.10); font-size:.95rem; color:var(--txt-soft);}
+    .value li:last-child{border-bottom:0;}
+    .value b{color:#fff;}
+
+    .note{margin-top:20px; padding:18px 22px; font-size:.92rem; color:#ffe6c2; background:linear-gradient(135deg,rgba(255,196,120,.16),var(--glass)); border-color:rgba(255,210,150,.35);}
+    .note b{color:#fff;}
+
+    .footer{margin-top:54px; padding-top:22px; border-top:1px solid rgba(255,255,255,.12); font-size:.82rem; color:var(--txt-faint); display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;}
+    .footer a{color:var(--cyan); text-decoration:none;}
+
+    @media (max-width:680px){ .flow{grid-template-columns:repeat(2,1fr);} .flow .step:not(:last-child)::after{display:none;} .card.star ul{columns:1;} }
+    @media (prefers-reduced-motion:reduce){ .blob{animation:none;} .reveal{animation:none; opacity:1; transform:none;} }
+  </style>
+</head>
+<body>
+  <div class="bg"></div>
+  <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+
+  <div class="wrap">
+    <div class="brand reveal">
+      <span class="brand__tag">BANANAFISH</span>
+      <span class="brand__sub">병원 인텔리전스 · 결과물 안내</span>
+    </div>
+
+    <section class="hero glass reveal" style="animation-delay:.05s">
+      <h1>내 주변 개원 병원부터<br/><span class="grad">법규에 맞는 도면까지, 가장 빠르게.</span></h1>
+      <p>내 주변에 개원해 있는 병원을 지도로 확인하고 검색·정보를 얻은 뒤, 내 병원 상태를 60초 만에 진단해 <strong style="color:#fff">법규에 맞는 도면을 가장 빠르게</strong> 받아보는 개원 올인원 시스템입니다.</p>
+      <div class="hero__stat">
+        <div class="pill"><b>79,554곳</b><span>전국 병·의원 데이터</span></div>
+        <div class="pill"><b>73개</b><span>인허가 점검 항목</span></div>
+        <div class="pill"><b>60초</b><span>무료 셀프 진단</span></div>
+      </div>
+      <a class="hero__cta" href="https://x77xdavid-prog.github.io/bananafish-hospital-intel/" target="_blank" rel="noopener">사이트 바로 보기 →</a>
+    </section>
+
+    <h2 class="sec reveal">한눈에 보는 흐름</h2>
+    <div class="flow">
+      <div class="step glass reveal" style="animation-delay:.05s"><i>01</i><b>내 주변 병원 지도</b><span>개원해 있는 병원을 지도로 확인</span></div>
+      <div class="step glass reveal" style="animation-delay:.12s"><i>02</i><b>검색 · 정보</b><span>진료과목·개원일·의사수 등 파악</span></div>
+      <div class="step glass reveal" style="animation-delay:.19s"><i>03</i><b>60초 셀프 진단</b><span>내 병원 인허가 상태 즉시 진단</span></div>
+      <div class="step glass final reveal" style="animation-delay:.26s"><i>04</i><b>법규 맞춤 도면</b><span>가장 빠르게 받아보기</span></div>
+    </div>
+
+    <h2 class="sec reveal">주요 기능</h2>
+    <div class="cards">
+      <div class="card glass reveal"><h3><span class="num">1</span> 병원 탐색</h3><p>전국 병원을 지도 + 목록으로. 병원명·지역·진료과목 검색(여러 단어 가능), 이름·개원·의사수 정렬 지원.</p></div>
+      <div class="card glass reveal" style="animation-delay:.08s"><h3><span class="num">2</span> 최근 검색어</h3><p>이전 검색어를 다시 눌러 검색하고 개별 삭제. 구글처럼 빠르고 익숙한 사용성.</p></div>
+      <div class="card glass star reveal" style="animation-delay:.16s">
+        <span class="badge">핵심 영업 도구</span>
+        <h3>⚡ 무료 개원 인허가 셀프 진단</h3>
+        <p>10문항(약 60초) 응답 → 결과 즉시 제공:</p>
+        <ul>
+          <li>인허가 난이도 등급 (★)</li>
+          <li>내 케이스 체크포인트 개수</li>
+          <li>먼저 챙길 주의 항목 TOP 3</li>
+          <li>연락처 입력 → 맞춤 체크리스트·무료 1차 검토 연결</li>
+        </ul>
+      </div>
+    </div>
+
+    <h2 class="sec reveal">비즈니스 관점의 의미</h2>
+    <ul class="value glass reveal">
+      <li>“복잡한 인허가, 저희가 대신 해드립니다”를 <b>체험형 진단</b>으로 보여주는 미끼 콘텐츠</li>
+      <li>방문자가 부담 없이 진단 → 자연스럽게 <b>상담 신청(잠재고객 수집)</b>으로 전환</li>
+      <li>신규 개원뿐 아니라 <b>이전·증축·리모델링</b> 병원까지 대상 포함</li>
+      <li>의료법·건축·소방·방사선 등 <b>실제 인허가 기준</b> 반영으로 전문성·신뢰 확보</li>
+    </ul>
+
+    <h2 class="sec reveal">오픈 전 마지막 한 가지</h2>
+    <div class="note glass reveal">
+      <b>진단 신청서 수신 연결</b>만 하면 즉시 운영 가능합니다. 현재는 임시로 담당 이메일로 받도록 되어 있으며, 전용 신청 폼(자동 수집) 연결도 바로 적용할 수 있습니다.
+    </div>
+
+    <div class="footer reveal">
+      <span>© 바나나피쉬 병원 인텔리전스</span>
+      <span>라이브: <a href="https://x77xdavid-prog.github.io/bananafish-hospital-intel/" target="_blank" rel="noopener">바로가기</a></span>
+    </div>
+  </div>
+</body>
+</html>
