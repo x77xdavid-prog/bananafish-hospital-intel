@@ -1,0 +1,677 @@
+/* =====================================================================
+   바나나피쉬 병원 인텔리전스 — 개원인허가 셀프진단 페이지 스타일
+   진단 흐름: Hero → Quiz(멀티스텝) → Result
+   Compositor-only animation: transform / opacity / width(progress bar)
+   ===================================================================== */
+
+/* ── Hero ──────────────────────────────────────────────────────────── */
+
+.dg-hero {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(2rem, 4vw, 4rem);
+  align-items: center;
+  padding-block: clamp(3.5rem, 6vw, 6rem);
+}
+
+@media (max-width: 720px) {
+  .dg-hero {
+    grid-template-columns: 1fr;
+  }
+  .dg-hero__visual {
+    display: none;
+  }
+}
+
+.dg-hero__eyebrow {
+  margin: 0 0 1rem;
+}
+
+.dg-hero__title {
+  margin: 0 0 1.25rem;
+  font-size: var(--t-mega);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.dg-hero__desc {
+  margin: 0 0 2rem;
+  font-size: clamp(1rem, 0.9rem + 0.4vw, 1.125rem);
+  color: var(--ink-soft);
+  max-width: 42ch;
+  line-height: 1.7;
+}
+
+/* Hero visual — decorative cards */
+.dg-hero__visual {
+  position: relative;
+  height: 280px;
+}
+
+.dg-hero__card {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 1.1rem 1.4rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-card);
+}
+
+.dg-hero__card-label {
+  font-size: var(--t-xs);
+  font-family: var(--font-mono);
+  color: var(--ink-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.dg-hero__card-val {
+  font-size: var(--t-h2);
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.dg-hero__card--1 { top: 0;    left: 10%; }
+.dg-hero__card--2 { top: 80px; right: 0;  }
+.dg-hero__card--3 { bottom: 0; left: 0;   }
+
+/* Entrance animation */
+.dg-hero__card--1 { animation: dg-float-in 0.55s var(--ease) 0.05s both; }
+.dg-hero__card--2 { animation: dg-float-in 0.55s var(--ease) 0.15s both; }
+.dg-hero__card--3 { animation: dg-float-in 0.55s var(--ease) 0.25s both; }
+
+@keyframes dg-float-in {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dg-hero__card--1,
+  .dg-hero__card--2,
+  .dg-hero__card--3 {
+    animation: none;
+  }
+}
+
+/* Masthead home link */
+.masthead__home-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+/* ── Buttons ───────────────────────────────────────────────────────── */
+
+.dg-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.4rem;
+  border-radius: var(--r-sm);
+  font-family: var(--font-sans);
+  font-size: var(--t-sm);
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: opacity var(--dur-fast) var(--ease),
+              transform var(--dur-fast) var(--ease);
+  text-decoration: none;
+}
+
+.dg-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.dg-btn--primary {
+  background: var(--accent);
+  color: #fff;
+}
+
+.dg-btn--primary:hover:not(:disabled) {
+  opacity: 0.88;
+  transform: translateY(-1px);
+}
+
+.dg-btn--ghost {
+  background: transparent;
+  color: var(--ink-soft);
+  border: 1px solid var(--line-strong);
+}
+
+.dg-btn--ghost:hover:not(:disabled) {
+  background: var(--surface-3);
+}
+
+.dg-btn--lg {
+  padding: 0.85rem 2rem;
+  font-size: 1rem;
+}
+
+.dg-btn__arrow {
+  width: 1.1em;
+  height: 1.1em;
+  flex-shrink: 0;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dg-btn {
+    transition: none;
+  }
+}
+
+/* ── Progress bar ──────────────────────────────────────────────────── */
+
+.dg-progress {
+  height: 4px;
+  background: var(--line);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 0.6rem;
+}
+
+.dg-progress__bar {
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
+  border-radius: 2px;
+  transition: width var(--dur) var(--ease);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dg-progress__bar {
+    transition: none;
+  }
+}
+
+.dg-step-indicator {
+  margin: 0 0 2rem;
+  font-size: var(--t-xs);
+  font-family: var(--font-mono);
+  color: var(--ink-faint);
+  letter-spacing: 0.04em;
+}
+
+/* ── Quiz section ──────────────────────────────────────────────────── */
+
+.dg-quiz {
+  padding-block: clamp(2.5rem, 4vw, 4.5rem);
+  max-width: 640px;
+}
+
+.dg-quiz__panel {
+  min-height: 220px;
+}
+
+/* Panel slide transition */
+.dg-quiz__panel.is-entering {
+  animation: dg-slide-in var(--dur-fast) var(--ease) both;
+}
+
+.dg-quiz__panel.is-leaving {
+  animation: dg-slide-out var(--dur-fast) var(--ease) both;
+}
+
+@keyframes dg-slide-in {
+  from { opacity: 0; transform: translateX(18px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes dg-slide-out {
+  from { opacity: 1; transform: translateX(0); }
+  to   { opacity: 0; transform: translateX(-18px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dg-quiz__panel.is-entering,
+  .dg-quiz__panel.is-leaving {
+    animation: none;
+  }
+}
+
+/* Quiz question */
+.dg-question {
+  margin: 0 0 1.75rem;
+}
+
+.dg-question__num {
+  display: block;
+  margin-bottom: 0.4rem;
+  font-size: var(--t-xs);
+  font-family: var(--font-mono);
+  color: var(--ink-faint);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.dg-question__text {
+  margin: 0;
+  font-size: clamp(1.05rem, 0.95rem + 0.45vw, 1.25rem);
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.45;
+}
+
+.dg-question__hint {
+  margin: 0.45rem 0 0;
+  font-size: var(--t-sm);
+  color: var(--ink-soft);
+  line-height: 1.55;
+}
+
+/* Option group */
+.dg-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.dg-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.85rem 1.1rem;
+  background: var(--surface);
+  border: 1.5px solid var(--line);
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: border-color var(--dur-fast) var(--ease),
+              background var(--dur-fast) var(--ease);
+}
+
+.dg-option:hover {
+  border-color: var(--accent-line);
+  background: var(--accent-soft);
+}
+
+.dg-option.is-selected {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.dg-option input[type="radio"],
+.dg-option input[type="checkbox"] {
+  margin-top: 0.1rem;
+  accent-color: var(--accent);
+  flex-shrink: 0;
+  width: 1.05rem;
+  height: 1.05rem;
+  cursor: pointer;
+}
+
+.dg-option__label {
+  font-size: var(--t-sm);
+  color: var(--ink);
+  cursor: pointer;
+  line-height: 1.5;
+}
+
+.dg-option__sub {
+  display: block;
+  font-size: var(--t-xs);
+  color: var(--ink-faint);
+  margin-top: 0.15rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dg-option {
+    transition: none;
+  }
+}
+
+/* Number input variant */
+.dg-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.dg-field__label {
+  font-size: var(--t-sm);
+  font-weight: 500;
+  color: var(--ink-soft);
+}
+
+.dg-field__input {
+  padding: 0.6rem 0.9rem;
+  font-family: var(--font-mono);
+  font-size: var(--t-sm);
+  color: var(--ink);
+  background: var(--surface);
+  border: 1.5px solid var(--line);
+  border-radius: var(--r-sm);
+  width: 140px;
+  transition: border-color var(--dur-fast) var(--ease);
+}
+
+.dg-field__input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dg-field__input {
+    transition: none;
+  }
+}
+
+/* Quiz nav */
+.dg-quiz__nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 2rem;
+  gap: 1rem;
+}
+
+/* ── Result section ────────────────────────────────────────────────── */
+
+.dg-result {
+  padding-block: clamp(2.5rem, 4vw, 4.5rem);
+}
+
+.dg-result__head {
+  margin-bottom: 2.5rem;
+}
+
+.dg-result__title {
+  margin: 0 0 0.5rem;
+  font-size: var(--t-h2);
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.dg-result__meta {
+  margin: 0;
+  font-size: var(--t-sm);
+  color: var(--ink-faint);
+}
+
+/* Difficulty badge */
+.dg-band {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 1.1rem;
+  border-radius: var(--r-sm);
+  font-weight: 700;
+  font-size: var(--t-sm);
+  margin-bottom: 2rem;
+}
+
+.dg-band--1 {
+  background: oklch(94% 0.04 150);
+  color: oklch(38% 0.12 150);
+}
+
+.dg-band--3 {
+  background: var(--warn-bg);
+  color: var(--warn-fg);
+}
+
+.dg-band--4 {
+  background: oklch(94.5% 0.04 25);
+  color: oklch(44% 0.14 25);
+}
+
+.dg-band__stars {
+  font-family: var(--font-mono);
+  letter-spacing: 0.05em;
+}
+
+.dg-band__label {
+  letter-spacing: 0.02em;
+}
+
+/* Top3 reject list */
+.dg-top3 {
+  margin: 0 0 2.5rem;
+}
+
+.dg-top3__title {
+  margin: 0 0 0.8rem;
+  font-size: var(--t-sm);
+  font-family: var(--font-mono);
+  color: var(--ink-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.dg-top3__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.dg-top3__item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  padding: 0.8rem 1rem;
+  background: oklch(97% 0.015 25);
+  border: 1px solid oklch(91% 0.03 25);
+  border-radius: var(--r-sm);
+  font-size: var(--t-sm);
+  color: var(--ink);
+  line-height: 1.5;
+}
+
+.dg-top3__num {
+  flex-shrink: 0;
+  width: 1.4rem;
+  height: 1.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: oklch(44% 0.14 25);
+  color: #fff;
+  font-size: var(--t-2xs);
+  font-weight: 700;
+  font-family: var(--font-mono);
+}
+
+/* Checkpoint table */
+.dg-chk {
+  margin: 0 0 2.5rem;
+}
+
+.dg-chk__title {
+  margin: 0 0 0.8rem;
+  font-size: var(--t-sm);
+  font-family: var(--font-mono);
+  color: var(--ink-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.dg-chk__count {
+  font-size: var(--t-xs);
+  color: var(--ink-ghost);
+  margin-left: 0.3rem;
+}
+
+.dg-chk__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--t-sm);
+}
+
+.dg-chk__table thead th {
+  text-align: left;
+  padding: 0.45rem 0.7rem;
+  font-size: var(--t-xs);
+  font-family: var(--font-mono);
+  color: var(--ink-faint);
+  border-bottom: 1px solid var(--line);
+  letter-spacing: 0.04em;
+}
+
+.dg-chk__table tbody tr {
+  border-bottom: 1px solid var(--line);
+}
+
+.dg-chk__table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.dg-chk__table tbody td {
+  padding: 0.55rem 0.7rem;
+  color: var(--ink);
+  vertical-align: top;
+}
+
+.dg-chk__id {
+  font-family: var(--font-mono);
+  font-size: var(--t-xs);
+  color: var(--ink-ghost);
+  white-space: nowrap;
+}
+
+.dg-chk__cat {
+  font-size: var(--t-xs);
+  color: var(--accent);
+  white-space: nowrap;
+}
+
+.dg-chk__flag {
+  font-size: var(--t-xs);
+  font-family: var(--font-mono);
+  color: oklch(44% 0.14 25);
+  white-space: nowrap;
+}
+
+/* Result CTA area */
+.dg-result__cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  margin-top: 2rem;
+}
+
+/* Result entrance animation */
+.dg-result.is-visible {
+  animation: dg-result-in 0.45s var(--ease) both;
+}
+
+@keyframes dg-result-in {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dg-result.is-visible {
+    animation: none;
+  }
+}
+
+/* ── Lead gate form ────────────────────────────────────────────────── */
+
+.dg-gate {
+  margin-top: 2.5rem;
+  padding: 1.75rem 2rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  max-width: 480px;
+}
+
+.dg-gate__title {
+  margin: 0 0 0.4rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.dg-gate__desc {
+  margin: 0 0 1.25rem;
+  font-size: var(--t-sm);
+  color: var(--ink-soft);
+  line-height: 1.6;
+}
+
+.dg-gate__form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.dg-gate__input {
+  padding: 0.6rem 0.9rem;
+  font-family: var(--font-sans);
+  font-size: var(--t-sm);
+  color: var(--ink);
+  background: var(--bg);
+  border: 1.5px solid var(--line);
+  border-radius: var(--r-sm);
+  transition: border-color var(--dur-fast) var(--ease);
+}
+
+.dg-gate__input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.dg-gate__input.is-error {
+  border-color: oklch(55% 0.18 25);
+}
+
+.dg-gate__error {
+  font-size: var(--t-xs);
+  color: oklch(44% 0.14 25);
+  display: none;
+}
+
+.dg-gate__error.is-visible {
+  display: block;
+}
+
+.dg-gate__agree {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: var(--t-xs);
+  color: var(--ink-soft);
+  line-height: 1.5;
+}
+
+.dg-gate__agree input[type="checkbox"] {
+  margin-top: 0.15rem;
+  accent-color: var(--accent);
+  flex-shrink: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dg-gate__input {
+    transition: none;
+  }
+}
+
+/* Footer link override */
+.footer__link {
+  color: var(--ink-soft);
+  text-decoration: none;
+  font-size: var(--t-sm);
+}
+
+.footer__link:hover {
+  color: var(--accent);
+}
