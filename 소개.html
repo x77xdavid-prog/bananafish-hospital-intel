@@ -31,7 +31,7 @@
       radial-gradient(44% 36% at 82% 96%, rgba(155,123,255,.13), transparent 60%),
       radial-gradient(40% 30% at 8% 98%, rgba(255,158,122,.12), transparent 60%),
       var(--bg);}
-    .blob{position:fixed; z-index:-1; border-radius:50%; filter:blur(70px); opacity:.30; animation:float 16s ease-in-out infinite;}
+    .blob{position:fixed; z-index:-1; border-radius:50%; filter:blur(70px); opacity:.32; will-change:transform; transition:opacity .4s ease;}
     .blob.b1{width:360px;height:360px; background:var(--blue); top:-70px; left:-50px;}
     .blob.b2{width:300px;height:300px; background:var(--mint); top:42%; right:-70px; animation-delay:-6s;}
     .blob.b3{width:300px;height:300px; background:var(--violet); bottom:-90px; left:32%; animation-delay:-10s;}
@@ -245,6 +245,49 @@
       }, { threshold:.5 });
       Array.prototype.forEach.call(nums, function(n){ io.observe(n); });
     })();
+  </script>
+
+  <!-- 인터랙티브 배경: 마우스 따라 색감 블롭이 자연스럽게 이동 + 은은한 색 변화 -->
+  <script>
+  (function(){
+    var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var blobs = Array.prototype.slice.call(document.querySelectorAll(".blob"));
+    var bg = document.querySelector(".bg");
+    if (!blobs.length) return;
+    if (reduce) return; // 모션 최소화 설정 시 정지
+
+    // 블롭별 깊이/자동드리프트 파라미터 (시차 효과)
+    var conf = blobs.map(function(_, i){
+      return { depth: 30 + i*18, sx: 0.00020 + i*0.00006, sy: 0.00026 + i*0.00005,
+               ax: 24 + i*8, ay: 20 + i*7, dir: (i % 2 ? -1 : 1), cx: 0, cy: 0 };
+    });
+    var tx = 0, ty = 0;      // 마우스 목표(-1..1)
+    var hue = 0, hueT = 0;   // 배경 색조 변화
+
+    function onMove(x, y){
+      tx = (x / window.innerWidth) * 2 - 1;
+      ty = (y / window.innerHeight) * 2 - 1;
+      hueT = tx * 14;        // 마우스 좌우로 ±14deg 은은한 색 변화
+    }
+    window.addEventListener("pointermove", function(e){ onMove(e.clientX, e.clientY); }, { passive:true });
+
+    function frame(t){
+      for (var i = 0; i < blobs.length; i++){
+        var c = conf[i];
+        var driftX = Math.sin(t * c.sx) * c.ax;        // 마우스 없어도 천천히 흐름
+        var driftY = Math.cos(t * c.sy) * c.ay;
+        var mx = tx * c.depth * c.dir;                 // 마우스 시차
+        var my = ty * c.depth;
+        c.cx += (mx - c.cx) * 0.045;                   // 부드러운 보간(lerp)
+        c.cy += (my - c.cy) * 0.045;
+        blobs[i].style.transform = "translate3d(" + (driftX + c.cx).toFixed(1) + "px," + (driftY + c.cy).toFixed(1) + "px,0)";
+      }
+      hue += (hueT - hue) * 0.035;
+      if (bg) bg.style.filter = "hue-rotate(" + hue.toFixed(2) + "deg)";
+      requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  })();
   </script>
 </body>
 </html>
