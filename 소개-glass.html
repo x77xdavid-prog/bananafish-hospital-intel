@@ -8,7 +8,6 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23344e9b'/%3E%3Cpath d='M16 7v18M7 16h18' stroke='white' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&display=swap" />
   <style>
     :root{
       --bg:#fbfbfd;
@@ -18,7 +17,7 @@
       --hair:rgba(20,30,60,.08);
       --shadow:0 20px 48px -26px rgba(28,40,80,.25);
       --r:22px; --r-sm:14px;
-      --display:"Sora","Pretendard Variable",sans-serif;
+      --display:"Pretendard Variable",Pretendard,-apple-system,system-ui,"Malgun Gothic",sans-serif;
       --body:"Pretendard Variable",Pretendard,-apple-system,system-ui,"Malgun Gothic",sans-serif;
     }
     *,*::before,*::after{box-sizing:border-box;}
@@ -137,9 +136,9 @@
       <h1>내 주변 개원 병원부터<br/><span class="grad">법규에 맞는 도면까지, 가장 빠르게.</span></h1>
       <p>내 주변에 개원해 있는 병원을 지도로 확인하고 검색·정보를 얻은 뒤, 내 병원 상태를 60초 만에 진단해 <strong>법규에 맞는 도면을 가장 빠르게</strong> 받아보는 개원 올인원 시스템입니다.</p>
       <div class="hero__stat">
-        <div class="pill"><b>79,554곳</b><span>전국 병·의원 데이터</span></div>
-        <div class="pill"><b>73개</b><span>인허가 점검 항목</span></div>
-        <div class="pill"><b>60초</b><span>무료 셀프 진단</span></div>
+        <div class="pill"><b><span class="cnt" data-to="79554">0</span>곳</b><span>전국 병·의원 데이터</span></div>
+        <div class="pill"><b><span class="cnt" data-to="73">0</span>개</b><span>인허가 점검 항목</span></div>
+        <div class="pill"><b><span class="cnt" data-to="60">0</span>초</b><span>무료 셀프 진단</span></div>
       </div>
       <a class="hero__cta" href="https://x77xdavid-prog.github.io/bananafish-hospital-intel/" target="_blank" rel="noopener">사이트 바로 보기 →</a>
     </section>
@@ -219,6 +218,32 @@
       var html = SAMPLES.map(card).join("");
       var track = document.getElementById("hTrack");
       if (track) track.innerHTML = html + html; // 끊김 없는 루프용 2배
+    })();
+
+    /* 숫자 카운트업 — 화면에 들어오면 0→목표값으로 상승 */
+    (function(){
+      var nums = document.querySelectorAll(".cnt");
+      var fmt = function(n){ return Math.round(n).toLocaleString("ko-KR"); };
+      var setFinal = function(el){ el.textContent = fmt(parseInt(el.getAttribute("data-to"),10)); };
+      if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches){
+        Array.prototype.forEach.call(nums, setFinal); return;
+      }
+      function run(el){
+        var to = parseInt(el.getAttribute("data-to"),10), dur = 1300, start = null;
+        function step(ts){
+          if(!start) start = ts;
+          var p = Math.min((ts - start)/dur, 1);
+          var eased = 1 - Math.pow(1 - p, 3);
+          el.textContent = fmt(to * eased);
+          if(p < 1) requestAnimationFrame(step); else setFinal(el);
+        }
+        requestAnimationFrame(step);
+      }
+      if (!("IntersectionObserver" in window)){ Array.prototype.forEach.call(nums, run); return; }
+      var io = new IntersectionObserver(function(entries){
+        entries.forEach(function(e){ if(e.isIntersecting){ run(e.target); io.unobserve(e.target); } });
+      }, { threshold:.5 });
+      Array.prototype.forEach.call(nums, function(n){ io.observe(n); });
     })();
   </script>
 </body>

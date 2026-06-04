@@ -3,119 +3,164 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>바나나피쉬 병원 인텔리전스 — 결과물 안내</title>
-  <meta name="description" content="전국 병·의원 79,554곳 데이터 + 무료 개원 인허가 셀프 진단. 바나나피쉬 병원 인텔리전스 결과물 안내." />
+  <title>바나나피쉬 병원 인텔리전스 — 소개</title>
+  <meta name="description" content="내 주변 개원 병원 지도 → 검색·정보 → 60초 진단 → 법규에 맞는 도면을 가장 빠르게. 바나나피쉬 병원 인텔리전스." />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23344e9b'/%3E%3Cpath d='M16 7v18M7 16h18' stroke='white' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
   <style>
     :root{
-      --ink:#1c2438; --ink-soft:#475069; --ink-faint:#79829a;
-      --blue:#3a5bd0; --blue-deep:#2c3f9b; --blue-soft:#eef2ff; --blue-line:#d9e1fb;
-      --bg:#f7f8fc; --surface:#ffffff; --line:#e7eaf3;
-      --r:16px; --r-sm:10px;
+      --bg:#fbfbfd;
+      --ink:#1d1d1f; --ink-soft:#4d4d52; --ink-faint:#86868b;
+      --blue:#2997ff; --blue-deep:#0071e3; --mint:#38c9a8; --violet:#9b7bff; --peach:#ff9e7a;
+      --glass:rgba(255,255,255,.58); --glass-2:rgba(255,255,255,.74);
+      --hair:rgba(20,30,60,.08);
+      --shadow:0 20px 48px -26px rgba(28,40,80,.25);
+      --r:22px; --r-sm:14px;
+      --display:"Pretendard Variable",Pretendard,-apple-system,system-ui,"Malgun Gothic",sans-serif;
+      --body:"Pretendard Variable",Pretendard,-apple-system,system-ui,"Malgun Gothic",sans-serif;
     }
     *,*::before,*::after{box-sizing:border-box;}
-    body{
-      margin:0; font-family:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,system-ui,"Segoe UI","Malgun Gothic",sans-serif;
-      color:var(--ink); background:var(--bg); line-height:1.65;
-      background-image:radial-gradient(120% 70% at 50% -10%, #eef2ff, transparent 60%);
-      -webkit-font-smoothing:antialiased;
-    }
-    .wrap{max-width:880px; margin:0 auto; padding:0 20px 80px;}
-    .brand{display:inline-flex; align-items:center; gap:.5rem; margin-top:40px;}
-    .brand__tag{background:var(--blue); color:#fff; font-weight:800; font-size:.72rem; letter-spacing:.06em; padding:.32rem .6rem; border-radius:7px;}
+    html{scroll-behavior:smooth;}
+    body{margin:0; font-family:var(--body); color:var(--ink); line-height:1.65; background:var(--bg); overflow-x:hidden; -webkit-font-smoothing:antialiased; word-break:keep-all;}
+
+    /* atmosphere: near-white with gentle pastel color washes (Apple-like) */
+    .bg{position:fixed; inset:0; z-index:-2; background:
+      radial-gradient(38% 30% at 12% 6%, rgba(41,151,255,.16), transparent 60%),
+      radial-gradient(34% 28% at 88% 4%, rgba(56,201,168,.14), transparent 62%),
+      radial-gradient(44% 36% at 82% 96%, rgba(155,123,255,.13), transparent 60%),
+      radial-gradient(40% 30% at 8% 98%, rgba(255,158,122,.12), transparent 60%),
+      var(--bg);}
+    .blob{position:fixed; z-index:-1; border-radius:50%; filter:blur(70px); opacity:.30; animation:float 16s ease-in-out infinite;}
+    .blob.b1{width:360px;height:360px; background:var(--blue); top:-70px; left:-50px;}
+    .blob.b2{width:300px;height:300px; background:var(--mint); top:42%; right:-70px; animation-delay:-6s;}
+    .blob.b3{width:300px;height:300px; background:var(--violet); bottom:-90px; left:32%; animation-delay:-10s;}
+    @keyframes float{0%,100%{transform:translateY(0) scale(1);}50%{transform:translateY(-24px) scale(1.05);}}
+
+    .wrap{max-width:920px; margin:0 auto; padding:0 20px 90px;}
+    .brand{display:inline-flex; align-items:center; gap:.55rem; margin-top:40px;}
+    .brand__tag{font-family:var(--display); background:linear-gradient(135deg,var(--blue-deep),var(--blue)); color:#fff; font-weight:800; font-size:.72rem; letter-spacing:.06em; padding:.34rem .62rem; border-radius:8px;}
     .brand__sub{font-size:.8rem; color:var(--ink-faint); letter-spacing:.02em;}
 
-    .hero{margin-top:28px; padding:38px 34px; background:linear-gradient(135deg,#3a5bd0,#2c3f9b); color:#fff; border-radius:24px; box-shadow:0 24px 60px -28px rgba(44,63,155,.6);}
-    .hero h1{margin:0 0 .5rem; font-size:clamp(1.7rem,1.1rem+2.4vw,2.6rem); line-height:1.18; letter-spacing:-.02em;}
-    .hero p{margin:0; color:#dfe6ff; font-size:1.05rem; max-width:60ch;}
-    .hero__stat{display:flex; gap:28px; margin-top:24px; flex-wrap:wrap;}
-    .hero__stat b{display:block; font-size:1.7rem; font-weight:800; letter-spacing:-.02em;}
-    .hero__stat span{font-size:.82rem; color:#c5cffb;}
-    .hero__cta{display:inline-flex; align-items:center; gap:.45rem; margin-top:26px; background:#fff; color:var(--blue-deep); font-weight:800; text-decoration:none; padding:.85rem 1.6rem; border-radius:999px; transition:transform .15s ease;}
-    .hero__cta:hover{transform:translateY(-2px);}
+    .glass{background:var(--glass); -webkit-backdrop-filter:blur(22px) saturate(160%); backdrop-filter:blur(22px) saturate(160%); border:1px solid var(--hair); border-radius:var(--r); box-shadow:var(--shadow), inset 0 1px 0 rgba(255,255,255,.7);}
 
-    .flow{display:grid; grid-template-columns:repeat(4,1fr); gap:24px; margin-top:18px;}
-    .flow .step{background:var(--surface); border:1px solid var(--line); border-radius:var(--r-sm); padding:16px 14px; position:relative;}
-    .flow .step b{display:block; font-size:.95rem; color:var(--ink); margin-bottom:.2rem;}
+    .reveal{opacity:0; transform:translateY(16px); animation:rise .7s cubic-bezier(.2,.7,.2,1) forwards;}
+    @keyframes rise{to{opacity:1; transform:none;}}
+
+    .hero{margin-top:26px; padding:clamp(28px,4vw,44px) clamp(22px,4vw,38px); position:relative; overflow:hidden;}
+    .hero::before{content:""; position:absolute; top:-30%; right:-8%; width:300px; height:300px; background:radial-gradient(circle,rgba(41,151,255,.22),transparent 65%); pointer-events:none;}
+    .hero h1{font-family:var(--display); margin:0 0 .6rem; font-size:clamp(1.8rem,1.1rem+3vw,3rem); line-height:1.15; letter-spacing:-.02em; position:relative;}
+    .hero h1 .grad{background:linear-gradient(110deg,var(--blue-deep),var(--blue) 55%,var(--violet)); -webkit-background-clip:text; background-clip:text; color:transparent;}
+    .hero p{margin:0; color:var(--ink-soft); font-size:clamp(.96rem,.9rem+.3vw,1.06rem); max-width:60ch;}
+    .hero p strong{color:var(--ink) !important;}
+    .hero__stat{display:flex; gap:12px; margin-top:24px; flex-wrap:wrap;}
+    .pill{flex:1 1 130px; padding:14px 16px; border-radius:var(--r-sm); background:var(--glass-2); border:1px solid var(--hair); text-align:center;}
+    .pill b{display:block; font-family:var(--display); font-size:clamp(1.35rem,1rem+1.4vw,1.6rem); letter-spacing:-.02em; background:linear-gradient(120deg,var(--blue-deep),var(--blue)); -webkit-background-clip:text; background-clip:text; color:transparent;}
+    .pill span{font-size:.78rem; color:var(--ink-faint);}
+    .hero__cta{display:inline-flex; align-items:center; gap:.5rem; margin-top:26px; font-weight:700; text-decoration:none; color:#fff;
+      background:var(--blue-deep); padding:.85rem 1.7rem; border-radius:999px;
+      box-shadow:0 12px 26px -12px rgba(0,113,227,.7); transition:transform .18s ease, background .18s ease;}
+    .hero__cta:hover{transform:translateY(-2px); background:#0a84ff;}
+
+    h2.sec{font-family:var(--display); font-size:1.02rem; margin:48px 0 16px; letter-spacing:.01em; color:var(--ink); display:flex; align-items:center; gap:.55rem; text-transform:uppercase;}
+    h2.sec::before{content:""; width:22px; height:3px; border-radius:2px; background:linear-gradient(90deg,var(--blue-deep),var(--blue));}
+
+    .flow{display:grid; grid-template-columns:repeat(4,1fr); gap:26px;}
+    .flow .step{padding:18px 16px; position:relative;}
+    .flow .step b{display:block; font-family:var(--display); font-size:.98rem; margin-bottom:.25rem;}
     .flow .step span{font-size:.8rem; color:var(--ink-faint);}
-    .flow .step i{position:absolute; top:10px; right:12px; font-size:.7rem; font-weight:800; color:var(--blue-line);}
-    .flow .step:not(:last-child)::after{content:"→"; position:absolute; right:-12px; top:50%; transform:translate(50%,-50%); color:var(--blue); font-weight:800; font-size:.9rem; line-height:1; z-index:1;}
-    .flow .step.final{background:linear-gradient(180deg,#fff,var(--blue-soft)); border-color:var(--blue-line);}
-    @media (max-width:680px){ .flow{grid-template-columns:repeat(2,1fr);} .flow .step:not(:last-child)::after{display:none;} }
+    .flow .step i{position:absolute; top:12px; right:14px; font-family:var(--display); font-size:.72rem; font-weight:800; color:rgba(20,30,60,.18);}
+    .flow .step:not(:last-child)::after{content:"→"; position:absolute; right:-15px; top:50%; transform:translate(50%,-50%); color:var(--blue-deep); font-weight:800; font-size:1rem; line-height:1;}
+    .flow .step.final{background:linear-gradient(180deg,rgba(41,151,255,.12),var(--glass)); border-color:rgba(41,151,255,.25);}
 
-    h2.sec{font-size:1.15rem; margin:48px 0 16px; letter-spacing:-.01em; display:flex; align-items:center; gap:.5rem;}
-    h2.sec::before{content:""; width:18px; height:3px; background:var(--blue); border-radius:2px;}
-
-    .cards{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:14px;}
-    .card{background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:20px; box-shadow:0 2px 10px -6px rgba(28,36,56,.12);}
-    .card.feature{position:relative;}
-    .card h3{margin:0 0 .4rem; font-size:1rem; display:flex; align-items:center; gap:.4rem;}
+    .cards{display:grid; grid-template-columns:repeat(auto-fit,minmax(238px,1fr)); gap:16px;}
+    .card{padding:22px;}
+    .card h3{font-family:var(--display); margin:0 0 .45rem; font-size:1rem; display:flex; align-items:center; gap:.45rem;}
     .card p{margin:0; font-size:.9rem; color:var(--ink-soft);}
-    .num{display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; border-radius:50%; background:var(--blue-soft); color:var(--blue-deep); font-size:.78rem; font-weight:800; flex:none;}
+    .num{display:inline-flex; align-items:center; justify-content:center; width:24px; height:24px; border-radius:50%; background:linear-gradient(135deg,var(--blue-deep),var(--blue)); color:#fff; font-size:.78rem; font-weight:800; flex:none;}
+    .card.star{grid-column:1/-1; background:linear-gradient(135deg,rgba(41,151,255,.12),rgba(56,201,168,.08)); border-color:rgba(41,151,255,.22);}
+    .card.star .badge{display:inline-block; margin-bottom:.6rem; font-family:var(--display); background:linear-gradient(135deg,var(--blue-deep),var(--blue)); color:#fff; font-size:.66rem; font-weight:800; padding:.24rem .56rem; border-radius:7px; letter-spacing:.03em;}
+    .card.star ul{margin:.5rem 0 0; padding-left:1.1rem; columns:2; column-gap:1.4rem; font-size:.9rem; color:var(--ink-soft);}
+    .card.star li{margin:.3rem 0; break-inside:avoid;}
 
-    .star{border:1px solid var(--blue-line); background:linear-gradient(180deg,#fff,var(--blue-soft)); }
-    .star .badge{display:inline-block; margin-bottom:.55rem; background:var(--blue); color:#fff; font-size:.66rem; font-weight:700; padding:.2rem .5rem; border-radius:6px;}
-    .star ul{margin:.6rem 0 0; padding-left:1.1rem; font-size:.88rem; color:var(--ink-soft);}
-    .star li{margin:.25rem 0;}
-
-    .value{background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:6px 22px;}
-    .value li{list-style:none; padding:14px 0; border-bottom:1px solid var(--line); font-size:.94rem; color:var(--ink-soft);}
+    .value{padding:6px 24px;}
+    .value li{list-style:none; padding:15px 0; border-bottom:1px solid var(--hair); font-size:.95rem; color:var(--ink-soft);}
     .value li:last-child{border-bottom:0;}
     .value b{color:var(--ink);}
 
-    .note{margin-top:20px; background:#fff8ed; border:1px solid #fde4bd; border-radius:var(--r); padding:18px 22px; font-size:.92rem; color:#7a5b22;}
+    .note{margin-top:20px; padding:18px 22px; font-size:.92rem; color:#7a5b22; background:linear-gradient(135deg,rgba(255,196,120,.18),var(--glass)); border-color:rgba(255,200,140,.4);}
     .note b{color:#5c4416;}
 
-    .footer{margin-top:54px; padding-top:22px; border-top:1px solid var(--line); font-size:.82rem; color:var(--ink-faint); display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;}
-    .footer a{color:var(--blue); text-decoration:none;}
-    @media (max-width:560px){ .hero{padding:30px 22px;} }
-    @media print{ body{background:#fff;} .hero{box-shadow:none;} }
+    /* 수록 병원 예시 — 슬라이드 마퀴 */
+    .marquee{position:relative; overflow:hidden; -webkit-mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent); mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent);}
+    .marquee__track{display:flex; gap:14px; width:max-content; animation:slide 38s linear infinite;}
+    .marquee:hover .marquee__track{animation-play-state:paused;}
+    @keyframes slide{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+    .hcard{flex:0 0 auto; width:clamp(196px,62vw,232px); padding:16px 18px; border-radius:var(--r-sm); background:var(--glass-2); -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); border:1px solid var(--hair); box-shadow:0 10px 26px -18px rgba(28,40,80,.3);}
+    .hcard__top{display:flex; align-items:center; gap:.5rem; margin-bottom:.5rem;}
+    .hdot{width:9px; height:9px; border-radius:50%; flex:none;}
+    .hcard__cl{font-size:.72rem; font-weight:700; color:var(--ink-faint);}
+    .hcard__nm{font-family:var(--display); font-size:.98rem; font-weight:700; letter-spacing:-.01em; margin:0 0 .15rem;}
+    .hcard__meta{font-size:.8rem; color:var(--ink-faint);}
+
+    .footer{margin-top:54px; padding-top:22px; border-top:1px solid var(--hair); font-size:.82rem; color:var(--ink-faint); display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;}
+    .footer a{color:var(--blue-deep); text-decoration:none;}
+
+    @media (max-width:680px){
+      .wrap{padding:0 16px 70px;}
+      .flow{grid-template-columns:repeat(2,1fr); gap:14px;}
+      .flow .step:not(:last-child)::after{display:none;}
+      .card.star ul{columns:1;}
+      .pill{flex:1 1 calc(50% - 6px);}
+      h2.sec{margin:36px 0 14px;}
+    }
+    @media (prefers-reduced-motion:reduce){
+      .blob{animation:none;}
+      .reveal{animation:none; opacity:1; transform:none;}
+      .marquee__track{animation:none;}
+      .marquee{overflow-x:auto; -webkit-mask-image:none; mask-image:none;}
+    }
   </style>
 </head>
 <body>
+  <div class="bg"></div>
+  <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+
   <div class="wrap">
-    <div class="brand">
+    <div class="brand reveal">
       <span class="brand__tag">BANANAFISH</span>
       <span class="brand__sub">병원 인텔리전스 · 결과물 안내</span>
     </div>
 
-    <section class="hero">
-      <h1>내 주변 개원 병원부터<br/>법규에 맞는 도면까지, 가장 빠르게.</h1>
-      <p>내 주변에 개원해 있는 병원을 지도로 확인하고 검색·정보를 얻은 뒤, 내 병원 상태를 60초 만에 진단해 <strong style="color:#fff">법규에 맞는 도면을 가장 빠르게</strong> 받아보는 개원 올인원 시스템입니다.</p>
+    <section class="hero glass reveal" style="animation-delay:.05s">
+      <h1>내 주변 개원 병원부터<br/><span class="grad">법규에 맞는 도면까지, 가장 빠르게.</span></h1>
+      <p>내 주변에 개원해 있는 병원을 지도로 확인하고 검색·정보를 얻은 뒤, 내 병원 상태를 60초 만에 진단해 <strong>법규에 맞는 도면을 가장 빠르게</strong> 받아보는 개원 올인원 시스템입니다.</p>
       <div class="hero__stat">
-        <div><b>79,554곳</b><span>전국 병·의원 데이터</span></div>
-        <div><b>73개</b><span>인허가 점검 항목</span></div>
-        <div><b>60초</b><span>무료 셀프 진단</span></div>
+        <div class="pill"><b><span class="cnt" data-to="79554">0</span>곳</b><span>전국 병·의원 데이터</span></div>
+        <div class="pill"><b><span class="cnt" data-to="73">0</span>개</b><span>인허가 점검 항목</span></div>
+        <div class="pill"><b><span class="cnt" data-to="60">0</span>초</b><span>무료 셀프 진단</span></div>
       </div>
       <a class="hero__cta" href="https://x77xdavid-prog.github.io/bananafish-hospital-intel/" target="_blank" rel="noopener">사이트 바로 보기 →</a>
     </section>
 
-    <h2 class="sec">한눈에 보는 흐름</h2>
+    <h2 class="sec reveal">한눈에 보는 흐름</h2>
     <div class="flow">
-      <div class="step"><i>01</i><b>내 주변 병원 지도</b><span>개원해 있는 병원을 지도로 확인</span></div>
-      <div class="step"><i>02</i><b>검색 · 정보</b><span>진료과목·개원일·의사수 등 파악</span></div>
-      <div class="step"><i>03</i><b>60초 셀프 진단</b><span>내 병원 인허가 상태 즉시 진단</span></div>
-      <div class="step final"><i>04</i><b>법규 맞춤 도면</b><span>가장 빠르게 받아보기</span></div>
+      <div class="step glass reveal" style="animation-delay:.05s"><i>01</i><b>내 주변 병원 지도</b><span>개원해 있는 병원을 지도로 확인</span></div>
+      <div class="step glass reveal" style="animation-delay:.12s"><i>02</i><b>검색 · 정보</b><span>진료과목·개원일·의사수 등 파악</span></div>
+      <div class="step glass reveal" style="animation-delay:.19s"><i>03</i><b>60초 셀프 진단</b><span>내 병원 인허가 상태 즉시 진단</span></div>
+      <div class="step glass final reveal" style="animation-delay:.26s"><i>04</i><b>법규 맞춤 도면</b><span>가장 빠르게 받아보기</span></div>
     </div>
 
-    <h2 class="sec">주요 기능</h2>
+    <h2 class="sec reveal">주요 기능</h2>
     <div class="cards">
-      <div class="card feature">
-        <h3><span class="num">1</span> 병원 탐색</h3>
-        <p>전국 병원을 지도 + 목록으로. 병원명·지역·진료과목 검색(여러 단어 가능), 이름·개원·의사수 정렬 지원.</p>
-      </div>
-      <div class="card feature">
-        <h3><span class="num">2</span> 최근 검색어</h3>
-        <p>이전 검색어를 다시 눌러 검색하고 개별 삭제. 구글처럼 빠르고 익숙한 사용성.</p>
-      </div>
-      <div class="card feature star">
+      <div class="card glass reveal"><h3><span class="num">1</span> 병원 탐색</h3><p>전국 병원을 지도 + 목록으로. 병원명·지역·진료과목 검색(여러 단어 가능), 이름·개원·의사수 정렬 지원.</p></div>
+      <div class="card glass reveal" style="animation-delay:.08s"><h3><span class="num">2</span> 최근 검색어</h3><p>이전 검색어를 다시 눌러 검색하고 개별 삭제. 구글처럼 빠르고 익숙한 사용성.</p></div>
+      <div class="card glass star reveal" style="animation-delay:.16s">
         <span class="badge">핵심 영업 도구</span>
         <h3>⚡ 무료 개원 인허가 셀프 진단</h3>
         <p>10문항(약 60초) 응답 → 결과 즉시 제공:</p>
         <ul>
-          <li>인허가 난이도 등급(★)</li>
+          <li>인허가 난이도 등급 (★)</li>
           <li>내 케이스 체크포인트 개수</li>
           <li>먼저 챙길 주의 항목 TOP 3</li>
           <li>연락처 입력 → 맞춤 체크리스트·무료 1차 검토 연결</li>
@@ -123,23 +168,83 @@
       </div>
     </div>
 
-    <h2 class="sec">비즈니스 관점의 의미</h2>
-    <ul class="value">
+    <h2 class="sec reveal">비즈니스 관점의 의미</h2>
+    <ul class="value glass reveal">
       <li>“복잡한 인허가, 저희가 대신 해드립니다”를 <b>체험형 진단</b>으로 보여주는 미끼 콘텐츠</li>
       <li>방문자가 부담 없이 진단 → 자연스럽게 <b>상담 신청(잠재고객 수집)</b>으로 전환</li>
       <li>신규 개원뿐 아니라 <b>이전·증축·리모델링</b> 병원까지 대상 포함</li>
       <li>의료법·건축·소방·방사선 등 <b>실제 인허가 기준</b> 반영으로 전문성·신뢰 확보</li>
     </ul>
 
-    <h2 class="sec">오픈 전 마지막 한 가지</h2>
-    <div class="note">
+    <h2 class="sec reveal">수록 병원 예시</h2>
+    <div class="marquee reveal">
+      <div class="marquee__track" id="hTrack"></div>
+    </div>
+
+    <h2 class="sec reveal">오픈 전 마지막 한 가지</h2>
+    <div class="note glass reveal">
       <b>진단 신청서 수신 연결</b>만 하면 즉시 운영 가능합니다. 현재는 임시로 담당 이메일로 받도록 되어 있으며, 전용 신청 폼(자동 수집) 연결도 바로 적용할 수 있습니다.
     </div>
 
-    <div class="footer">
+    <div class="footer reveal">
       <span>© 바나나피쉬 병원 인텔리전스</span>
-      <span>라이브: <a href="https://x77xdavid-prog.github.io/bananafish-hospital-intel/" target="_blank" rel="noopener">x77xdavid-prog.github.io/bananafish-hospital-intel</a></span>
+      <span>라이브: <a href="https://x77xdavid-prog.github.io/bananafish-hospital-intel/" target="_blank" rel="noopener">바로가기</a></span>
     </div>
   </div>
+
+  <script>
+    (function(){
+      // 종별 색(메인 사이트 팔레트와 동일 계열)
+      var CL = { "의원":"#2997ff", "치과의원":"#22b8c9", "한의원":"#2bb673", "병원":"#ff6a5e", "종합병원":"#ff6a5e", "요양병원":"#ff8c42" };
+      var SAMPLES = [
+        ["연세365내과의원","의원","송파구","내과 · 소화기내과"],
+        ["강남밝은미소치과의원","치과의원","강남구","구강악안면외과 · 보철과"],
+        ["서울튼튼정형외과의원","의원","서초구","정형외과 · 재활의학과"],
+        ["새봄여성의원","의원","성남분당구","산부인과"],
+        ["행복드림소아청소년과의원","의원","노원구","소아청소년과"],
+        ["한빛한의원","한의원","성동구","한방내과 · 침구과"],
+        ["굿모닝안과의원","의원","강서구","안과"],
+        ["미래연합의원","의원","마포구","가정의학과 · 내과"],
+        ["참편한정신건강의학과의원","의원","용산구","정신건강의학과"],
+        ["우리들이비인후과의원","의원","구로구","이비인후과"]
+      ];
+      function card(s){
+        var color = CL[s[1]] || "#2997ff";
+        return '<div class="hcard">'
+          + '<div class="hcard__top"><span class="hdot" style="background:'+color+'"></span><span class="hcard__cl">'+s[1]+'</span></div>'
+          + '<p class="hcard__nm">'+s[0]+'</p>'
+          + '<p class="hcard__meta">'+s[2]+' · '+s[3]+'</p></div>';
+      }
+      var html = SAMPLES.map(card).join("");
+      var track = document.getElementById("hTrack");
+      if (track) track.innerHTML = html + html; // 끊김 없는 루프용 2배
+    })();
+
+    /* 숫자 카운트업 — 화면에 들어오면 0→목표값으로 상승 */
+    (function(){
+      var nums = document.querySelectorAll(".cnt");
+      var fmt = function(n){ return Math.round(n).toLocaleString("ko-KR"); };
+      var setFinal = function(el){ el.textContent = fmt(parseInt(el.getAttribute("data-to"),10)); };
+      if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches){
+        Array.prototype.forEach.call(nums, setFinal); return;
+      }
+      function run(el){
+        var to = parseInt(el.getAttribute("data-to"),10), dur = 1300, start = null;
+        function step(ts){
+          if(!start) start = ts;
+          var p = Math.min((ts - start)/dur, 1);
+          var eased = 1 - Math.pow(1 - p, 3);
+          el.textContent = fmt(to * eased);
+          if(p < 1) requestAnimationFrame(step); else setFinal(el);
+        }
+        requestAnimationFrame(step);
+      }
+      if (!("IntersectionObserver" in window)){ Array.prototype.forEach.call(nums, run); return; }
+      var io = new IntersectionObserver(function(entries){
+        entries.forEach(function(e){ if(e.isIntersecting){ run(e.target); io.unobserve(e.target); } });
+      }, { threshold:.5 });
+      Array.prototype.forEach.call(nums, function(n){ io.observe(n); });
+    })();
+  </script>
 </body>
 </html>
