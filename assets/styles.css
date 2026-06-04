@@ -149,10 +149,8 @@ em { font-style: normal; }
 
 /* ============ toolbar ============ */
 .toolbar {
-  position: sticky; top: 0; z-index: 600;
-  background: oklch(98.6% 0.004 95 / .85);
-  backdrop-filter: blur(14px) saturate(1.4);
-  -webkit-backdrop-filter: blur(14px) saturate(1.4);
+  position: static;
+  background: var(--bg);
   border-bottom: 1px solid var(--line);
 }
 .toolbar__inner { display: flex; align-items: center; gap: .8rem; padding: .7rem 0; flex-wrap: wrap; }
