@@ -31,7 +31,7 @@
   ];
 
   var DEFAULTS = { situation:"new", type:"clinic", depts:[], inpatient:0, surgery:"none",
-    radiology:"none", narcotics:false, regen:false, building:"new", floors:1, region:"" };
+    radiology:"none", narcotics:false, regen:false, building:"new", floors:1 };
 
   var state = { idx:0, answers: load() };
 
@@ -108,10 +108,17 @@
 
     html += renderGate();
     html += '<p class="dg-disclaimer">본 결과는 참고용 1차 진단이며, 최종 적용 기준은 관할기관(보건소·소방서·구청) 협의로 확정됩니다.</p>';
+    html += '<div class="dg-restart"><button type="button" class="dg-btn dg-btn--ghost" id="dgRestart">↻ 다시 진단하기</button></div>';
 
     $("dgQuiz").hidden = true;
     var r = $("dgResult"); r.hidden = false; r.innerHTML = html;
     bindGate(applied, band, score);
+    var rb = $("dgRestart");
+    if (rb) rb.addEventListener("click", function () {
+      state.idx = 0; state.answers = Object.assign({}, DEFAULTS); save();
+      r.hidden = true; $("dgQuiz").hidden = true; $("dgHero").hidden = false;
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
     r.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
