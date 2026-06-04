@@ -180,8 +180,8 @@
   }
   function initMap() {
     map = new naver.maps.Map("map", {
-      center: new naver.maps.LatLng(37.515, 127.03),
-      zoom: 12, minZoom: 9,
+      center: new naver.maps.LatLng(37.553, 126.99),
+      zoom: 11, minZoom: 9,
       scaleControl: true, mapDataControl: false, logoControl: true,
       zoomControl: true, zoomControlOptions: { position: naver.maps.Position.RIGHT_TOP }
     });
