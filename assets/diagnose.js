@@ -45,7 +45,7 @@
 
   function renderStep() {
     var qd = QUESTIONS[state.idx];
-    $("dgBar").style.width = Math.round((state.idx) / QUESTIONS.length * 100) + "%";
+    $("dgBar").style.width = Math.round((state.idx + 1) / QUESTIONS.length * 100) + "%";
     var cur = state.answers[qd.key];
     var html = '<p class="dg-step__q">' + qd.q + '</p>';
     qd.options.forEach(function (opt) {
@@ -140,13 +140,17 @@
 
   function bindGate(applied, band, score) {
     var form = $("dgGate"); if (!form) return;
+    if (form.dataset.bound) return;          // 재진입 시 리스너 중복 방지
+    form.dataset.bound = "1";
+    var submitBtn = $("gSubmit");
+    var msg = $("gMsg");
     form.addEventListener("submit", function (e) {
       e.preventDefault();
+      msg.textContent = "";
       var name = $("gName").value.trim();
       var phone = $("gPhone").value.trim();
       var email = $("gEmail").value.trim();
       var consent = $("gConsent").checked;
-      var msg = $("gMsg");
       if (!name || !phone || !email) { msg.textContent = "성함·연락처·이메일을 입력해 주세요."; return; }
       if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { msg.textContent = "이메일 형식을 확인해 주세요."; return; }
       if (!consent) { msg.textContent = "개인정보 수집·이용 동의가 필요합니다."; return; }
@@ -156,13 +160,12 @@
         난이도: band.label, 점수: score, 체크포인트수: applied.length,
         진단응답: JSON.stringify(state.answers)
       };
-      $("gSubmit").disabled = true; msg.textContent = "전송 중…";
+      submitBtn.disabled = true; msg.textContent = "전송 중…";
       submitLead(payload).then(function () {
         msg.textContent = "접수되었습니다. 맞춤 체크리스트와 1차 검토 안내를 곧 보내드립니다.";
         try { localStorage.removeItem(LS_KEY); } catch (e2) {}
       }).catch(function () {
-        $("gSubmit").disabled = false;
-        // 폴백: mailto
+        submitBtn.disabled = false;
         var body = encodeURIComponent("개원 인허가 진단 결과\n" + JSON.stringify(payload, null, 2));
         window.location.href = "mailto:" + FALLBACK_EMAIL + "?subject=" +
           encodeURIComponent("[셀프진단] " + name + " 님 인허가 의뢰") + "&body=" + body;
