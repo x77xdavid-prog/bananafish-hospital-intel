@@ -138,6 +138,47 @@
     $("dgPrev").addEventListener("click", back);
   }
 
+  function bindGate(applied, band, score) {
+    var form = $("dgGate"); if (!form) return;
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var name = $("gName").value.trim();
+      var phone = $("gPhone").value.trim();
+      var email = $("gEmail").value.trim();
+      var consent = $("gConsent").checked;
+      var msg = $("gMsg");
+      if (!name || !phone || !email) { msg.textContent = "성함·연락처·이메일을 입력해 주세요."; return; }
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { msg.textContent = "이메일 형식을 확인해 주세요."; return; }
+      if (!consent) { msg.textContent = "개인정보 수집·이용 동의가 필요합니다."; return; }
+
+      var payload = {
+        name: name, phone: phone, email: email,
+        난이도: band.label, 점수: score, 체크포인트수: applied.length,
+        진단응답: JSON.stringify(state.answers)
+      };
+      $("gSubmit").disabled = true; msg.textContent = "전송 중…";
+      submitLead(payload).then(function () {
+        msg.textContent = "접수되었습니다. 맞춤 체크리스트와 1차 검토 안내를 곧 보내드립니다.";
+        try { localStorage.removeItem(LS_KEY); } catch (e2) {}
+      }).catch(function () {
+        $("gSubmit").disabled = false;
+        // 폴백: mailto
+        var body = encodeURIComponent("개원 인허가 진단 결과\n" + JSON.stringify(payload, null, 2));
+        window.location.href = "mailto:" + FALLBACK_EMAIL + "?subject=" +
+          encodeURIComponent("[셀프진단] " + name + " 님 인허가 의뢰") + "&body=" + body;
+      });
+    });
+  }
+
+  function submitLead(payload) {
+    if (!FORM_ENDPOINT) return Promise.reject(new Error("no endpoint"));
+    return fetch(FORM_ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Accept": "application/json" },
+      body: JSON.stringify(payload)
+    }).then(function (r) { if (!r.ok) throw new Error("submit failed"); return r; });
+  }
+
   // 외부(테스트/Task7)에서 접근할 수 있도록 노출
   window.BFDiag = { state: state, QUESTIONS: QUESTIONS, start: start, save: save };
   document.addEventListener("DOMContentLoaded", bind);
