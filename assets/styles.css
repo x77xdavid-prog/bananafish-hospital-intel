@@ -405,7 +405,7 @@ details[open] .sources__sum::before { transform: rotate(90deg); }
   font-size: var(--t-sm);
 }
 .dirrow:last-child { border-bottom: 0; }
-.dirrow--head { background: var(--surface-2); position: sticky; top: 150px; z-index: 2; }
+.dirrow--head { background: var(--surface-2); }
 .dirrow--head span { font-family: var(--font-mono); font-size: var(--t-2xs); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-faint); font-weight: 500; }
 .dirrow--data { cursor: pointer; transition: background var(--dur-fast); }
 .dirrow--data:hover { background: var(--accent-soft); }
