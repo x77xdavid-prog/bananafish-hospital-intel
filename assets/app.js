@@ -49,7 +49,7 @@
   function displayName(h) { var d = DEEP[h.id]; return (d && d.name) ? d.name : clean(h.name); }
 
   /* ---------- state ---------- */
-  var state = { q: "", gus: {}, types: {}, era: "all", sort: "name", page: 1 };
+  var state = { q: "", sidos: {}, types: {}, era: "all", sort: "name", page: 1 };
   var PAGE_SIZE = 50;
 
   // 검색 인덱스 캐시
@@ -60,7 +60,7 @@
 
   function matches(h) {
     if (state.q && h._s.indexOf(state.q) === -1) return false;
-    if (hasKeys(state.gus) && !state.gus[h.gu]) return false;
+    if (hasKeys(state.sidos) && !state.sidos[h.sido]) return false;
     if (hasKeys(state.types) && !state.types[h.cl]) return false;
     if (state.era !== "all") {
       if (!h.open) return false;
@@ -94,9 +94,9 @@
   /* ---------- filters UI ---------- */
   function buildFilters() {
     // gu
-    var guCounts = META.byGu || count("gu");
-    el("filtersGu").innerHTML = Object.keys(guCounts).map(function (g) {
-      return chip("gu", g, g, guCounts[g]);
+    var sidoCounts = count("sido");
+    el("filtersGu").innerHTML = Object.keys(sidoCounts).sort(function (a, b) { return sidoCounts[b] - sidoCounts[a]; }).map(function (s) {
+      return chip("sido", s, s, sidoCounts[s]);
     }).join("");
     // type (정렬: 많은 순)
     var tc = META.byType || count("cl");
@@ -119,10 +119,14 @@
   /* ---------- map (NAVER Dynamic Map) ---------- */
   var map, clusterer, markerById = {}, infoWindow;
   var curMapRecs = [];
-  var GROUPS = { gu: {}, emd: {} };          // key -> {lat,lng,label}
-  var regionMarkers = { gu: {}, emd: {} };   // key -> naver Marker
-  var GU_MAX_ZOOM = 12;                       // ≤12: 구 / 13~14: 동 / ≥15: 마커 클러스터 (다방식)
-  var EMD_MAX_ZOOM = 14;
+  var GROUPS = { sido: {}, gu: {}, emd: {} };        // key -> {lat,lng,label}
+  var regionMarkers = { sido: {}, gu: {}, emd: {} }; // key -> naver Marker (지연 생성·캐시)
+  var shownRegion = [];                              // 현재 표시 중인 지역 버블
+  var MARKER_CAP = 3000;                             // 클러스터 단계 viewport 마커 상한
+  function tierFor(z) { return z <= 9 ? "sido" : z <= 11 ? "gu" : z <= 13 ? "emd" : "cluster"; }
+  function groupKey(tier, h) {
+    return tier === "sido" ? h.sido : tier === "gu" ? h.sido + "|" + h.gu : h.sido + "|" + h.gu + "|" + h.emd;
+  }
   function clusterIcon(cls, px) {
     return { content: '<div class="navclust ' + cls + '"><span>0</span></div>',
              size: new naver.maps.Size(px, px), anchor: new naver.maps.Point(px / 2, px / 2) };
@@ -135,53 +139,75 @@
     return { content: '<div class="region-bubble"><b>' + esc(label) + "</b><i>" + fmtNum(count) + "</i></div>",
              anchor: new naver.maps.Point(0, 0) };
   }
-  // 구·동 그룹 중심좌표 계산 + 지역 버블 마커 생성
+  // 시도·시군구·동 그룹 중심좌표만 계산(마커는 지연 생성)
   function buildGroups() {
-    var acc = { gu: {}, emd: {} };
+    var acc = { sido: {}, gu: {}, emd: {} };
     function add(o, k, label, h) { var a = o[k] || (o[k] = { la: 0, ln: 0, n: 0, label: label }); a.la += h.lat; a.ln += h.lng; a.n++; }
     HOSP.forEach(function (h) {
-      add(acc.gu, h.gu, h.gu, h);
-      if (h.emd) add(acc.emd, h.gu + "|" + h.emd, h.emd, h);
+      add(acc.sido, h.sido, h.sido, h);
+      add(acc.gu, h.sido + "|" + h.gu, h.gu, h);
+      if (h.emd) add(acc.emd, h.sido + "|" + h.gu + "|" + h.emd, h.emd, h);
     });
-    ["gu", "emd"].forEach(function (t) {
-      Object.keys(acc[t]).forEach(function (k) {
-        var a = acc[t][k]; GROUPS[t][k] = { lat: a.la / a.n, lng: a.ln / a.n, label: a.label };
-        var rm = new naver.maps.Marker({ position: new naver.maps.LatLng(GROUPS[t][k].lat, GROUPS[t][k].lng), icon: regionIcon(a.label, 0), zIndex: 200 });
-        rm.setMap(null);
-        naver.maps.Event.addListener(rm, "click", (function (g, tt) {
-          return function () { map.morph(new naver.maps.LatLng(g.lat, g.lng), tt === "gu" ? 14 : 16); };
-        })(GROUPS[t][k], t));
-        regionMarkers[t][k] = rm;
-      });
+    ["sido", "gu", "emd"].forEach(function (t) {
+      Object.keys(acc[t]).forEach(function (k) { var a = acc[t][k]; GROUPS[t][k] = { lat: a.la / a.n, lng: a.ln / a.n, label: a.label }; });
     });
   }
-  // 줌 레벨에 따라 구 집계 → 동 집계 → 마커 클러스터로 전환 (다방식)
-  function applyMapMode(recs) {
+  function getRegionMarker(t, k) {
+    var m = regionMarkers[t][k];
+    if (!m) {
+      var g = GROUPS[t][k];
+      m = new naver.maps.Marker({ position: new naver.maps.LatLng(g.lat, g.lng), icon: regionIcon(g.label, 0), zIndex: 200 });
+      m.setMap(null);
+      naver.maps.Event.addListener(m, "click", (function (gg, tt) {
+        return function () { map.morph(new naver.maps.LatLng(gg.lat, gg.lng), tt === "sido" ? 12 : tt === "gu" ? 14 : 16); };
+      })(g, t));
+      regionMarkers[t][k] = m;
+    }
+    return m;
+  }
+  function getIndivMarker(h) {
+    var m = markerById[h.id];
+    if (!m) {
+      var deep = h._deep, sz = deep ? 18 : 14;
+      m = new naver.maps.Marker({
+        position: new naver.maps.LatLng(h.lat, h.lng), title: h.name,
+        icon: { content: '<div class="hmk' + (deep ? " hmk--deep" : "") + '"></div>', anchor: new naver.maps.Point(sz / 2, sz / 2) },
+        zIndex: deep ? 100 : 50
+      });
+      naver.maps.Event.addListener(m, "click", (function (hh, mm) { return function () { openInfo(hh, mm); }; })(h, m));
+      markerById[h.id] = m;
+    }
+    return m;
+  }
+  // 줌+화면영역에 따라 시도→시군구→동→개별 클러스터로 그림 (지연 생성 + viewport 한정으로 대규모 대응)
+  function redraw() {
     if (!map || !clusterer) return;
-    var z = map.getZoom();
-    var tier = z <= GU_MAX_ZOOM ? "gu" : (z <= EMD_MAX_ZOOM ? "emd" : "cluster");
-    ["gu", "emd"].forEach(function (t) {
-      if (t !== tier) Object.keys(regionMarkers[t]).forEach(function (k) { regionMarkers[t][k].setMap(null); });
-    });
+    var b = map.getBounds(); if (!b) return;
+    var recs = curMapRecs, tier = tierFor(map.getZoom());
+    shownRegion.forEach(function (m) { m.setMap(null); }); shownRegion = [];
     if (tier === "cluster") {
       var ms = [];
-      for (var j = 0; j < recs.length; j++) { var mm = markerById[recs[j].id]; if (mm) ms.push(mm); }
+      for (var i = 0; i < recs.length && ms.length < MARKER_CAP; i++) {
+        var h = recs[i];
+        if (b.hasLatLng(new naver.maps.LatLng(h.lat, h.lng))) ms.push(getIndivMarker(h));
+      }
       clusterer.setMarkers(ms);
     } else {
       clusterer.setMarkers([]);
       var counts = {};
-      for (var i = 0; i < recs.length; i++) { var h = recs[i]; var k = tier === "gu" ? h.gu : h.gu + "|" + h.emd; counts[k] = (counts[k] || 0) + 1; }
-      Object.keys(regionMarkers[tier]).forEach(function (k) {
-        var rm = regionMarkers[tier][k], c = counts[k] || 0;
-        if (c > 0) { rm.setIcon(regionIcon(GROUPS[tier][k].label, c)); rm.setMap(map); } else rm.setMap(null);
+      for (var j = 0; j < recs.length; j++) { var k = groupKey(tier, recs[j]); if (k) counts[k] = (counts[k] || 0) + 1; }
+      Object.keys(counts).forEach(function (k) {
+        var g = GROUPS[tier][k]; if (!g) return;
+        if (!b.hasLatLng(new naver.maps.LatLng(g.lat, g.lng))) return;
+        var rm = getRegionMarker(tier, k); rm.setIcon(regionIcon(g.label, counts[k])); rm.setMap(map); shownRegion.push(rm);
       });
     }
-    naver.maps.Event.trigger(map, "idle");
+    if (clusterer._redraw) clusterer._redraw();
   }
   function initMap() {
     map = new naver.maps.Map("map", {
-      center: new naver.maps.LatLng(37.553, 126.99),
-      zoom: 11, minZoom: 9,
+      center: new naver.maps.LatLng(36.5, 127.85),
+      zoom: 7, minZoom: 6,
       scaleControl: true, mapDataControl: false, logoControl: true,
       zoomControl: true, zoomControlOptions: { position: naver.maps.Position.RIGHT_TOP }
     });
@@ -190,20 +216,6 @@
       backgroundColor: "transparent", pixelOffset: new naver.maps.Point(0, -4)
     });
     naver.maps.Event.addListener(map, "click", function () { infoWindow.close(); });
-
-    HOSP.forEach(function (h) {
-      var deep = h._deep, sz = deep ? 18 : 14;
-      var m = new naver.maps.Marker({
-        position: new naver.maps.LatLng(h.lat, h.lng), title: h.name,
-        icon: { content: '<div class="hmk' + (deep ? " hmk--deep" : "") + '"></div>',
-                anchor: new naver.maps.Point(sz / 2, sz / 2) },
-        zIndex: deep ? 100 : 50
-      });
-      naver.maps.Event.addListener(m, "click", (function (hh, mm) {
-        return function () { openInfo(hh, mm); };
-      })(h, m));
-      markerById[h.id] = m;
-    });
 
     clusterer = new MarkerClustering({
       map: map, markers: [], disableClickZoom: false,
@@ -216,7 +228,7 @@
     });
 
     buildGroups();
-    naver.maps.Event.addListener(map, "zoom_changed", function () { applyMapMode(curMapRecs); });
+    naver.maps.Event.addListener(map, "idle", redraw);
   }
 
   // 최신 확인 — 외부 공개 출처(네이버 검색/지도/뉴스/공식 홈페이지)를 새 탭으로 열어 최신 정보 확인
@@ -245,17 +257,16 @@
   function updateMap(recs) {
     if (!clusterer) return;
     curMapRecs = recs;
-    applyMapMode(recs);
+    redraw();
     el("mapCount").textContent = fmtNum(recs.length);
   }
 
   function focusHospital(h) {
-    var m = markerById[h.id];
-    if (!m || !map) return;
+    if (!map) return;
     document.querySelector(".mapsection").scrollIntoView({ behavior: "smooth", block: "start" });
-    map.setCenter(m.getPosition());
+    map.setCenter(new naver.maps.LatLng(h.lat, h.lng));
     map.setZoom(17);
-    setTimeout(function () { openInfo(h, m); }, 320);
+    setTimeout(function () { openInfo(h, getIndivMarker(h)); }, 360);
   }
 
   /* ---------- directory ---------- */
@@ -480,7 +491,7 @@
 
     el("filterbar").addEventListener("click", function (e) {
       var c = e.target.closest(".filter-chip"); if (!c) return;
-      if (c.dataset.gu !== undefined) toggleSet(state.gus, c.dataset.gu, c);
+      if (c.dataset.sido !== undefined) toggleSet(state.sidos, c.dataset.sido, c);
       else if (c.dataset.type !== undefined) toggleSet(state.types, c.dataset.type, c);
       else if (c.dataset.era !== undefined) selectEra(c.dataset.era);
       refresh(true);
@@ -489,7 +500,7 @@
     el("sortSel").addEventListener("change", function () { state.sort = this.value; refresh(false); });
 
     el("resetBtn").addEventListener("click", function () {
-      state = { q: "", gus: {}, types: {}, era: "all", sort: state.sort, page: 1 };
+      state = { q: "", sidos: {}, types: {}, era: "all", sort: state.sort, page: 1 };
       el("search").value = "";
       document.querySelectorAll("#filterbar .filter-chip").forEach(function (c) {
         c.setAttribute("aria-pressed", c.dataset.era === "all" ? "true" : "false");
@@ -535,7 +546,7 @@
   function gotoDeep(id) {
     var card = el("deep-" + id);
     if (!card) { // 필터에 가려졌으면 초기화 후 재시도
-      state = { q: "", gus: {}, types: {}, era: "all", sort: state.sort, page: 1 };
+      state = { q: "", sidos: {}, types: {}, era: "all", sort: state.sort, page: 1 };
       el("search").value = "";
       document.querySelectorAll("#filterbar .filter-chip").forEach(function (c) {
         c.setAttribute("aria-pressed", c.dataset.era === "all" ? "true" : "false");

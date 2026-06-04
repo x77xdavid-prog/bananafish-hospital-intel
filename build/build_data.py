@@ -16,8 +16,8 @@ HOSP = os.path.join(RAW, "1.병원정보서비스(2026.3.).xlsx")
 DEPT = os.path.join(RAW, "5.의료기관별상세정보서비스_03_진료과목정보(2026.3.).xlsx")
 
 # ── 수록 범위 (여기만 바꾸면 확장) ───────────────────────────
-TARGET_SIDO = "서울"
-TARGET_GU = None   # None = 서울 전체 25개 자치구
+TARGET_SIDO = None   # None = 전국 / "서울" 등으로 한정 가능
+TARGET_GU = None   # None = 시도 내 전체 자치구
 SRC_LABEL = "건강보험심사평가원 · 전국 병의원 및 약국 현황(2026.3.)"
 DATA_VER = "2026.3"
 # ────────────────────────────────────────────────────────────
@@ -65,7 +65,7 @@ next(it)  # header
 records = {}     # id -> record dict
 yk2id = {}       # ykiho -> id
 for r in it:
-    if r[C_SIDO] != TARGET_SIDO:
+    if TARGET_SIDO is not None and r[C_SIDO] != TARGET_SIDO:
         continue
     if TARGET_GU is not None and r[C_GU] not in TARGET_GU:
         continue
@@ -84,6 +84,7 @@ for r in it:
         "id": _id,
         "name": (r[C_NAME] or "").strip(),
         "cl": r[C_CL],
+        "sido": r[C_SIDO],
         "gu": r[C_GU],
         "emd": r[C_EMD],
         "addr": (r[C_ADDR] or "").strip(),
