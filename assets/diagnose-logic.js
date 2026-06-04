@@ -20,7 +20,25 @@
     return t;
   }
 
-  var api = { deriveActiveTags: deriveActiveTags };
+  function scoreCase(a) {
+    var base = { clinic:1, dental:1, oriental:1, nursing:2, hospital:2, general:3 };
+    var s = base[a.type] || 1;
+    if (a.inpatient && Number(a.inpatient) > 0) s += 1;
+    if (a.radiology === "ct") s += 1;
+    if (a.narcotics) s += 1;
+    if (a.regen) s += 1;
+    if (a.building === "existing" || a.situation === "remodel") s += 1;
+    if (Number(a.floors) >= 3) s += 1;
+    return s;
+  }
+
+  function difficultyBand(score) {
+    if (score <= 2) return { stars:1, label:"수월" };
+    if (score <= 4) return { stars:3, label:"주의" };
+    return { stars:4, label:"까다로움" };
+  }
+
+  var api = { deriveActiveTags: deriveActiveTags, scoreCase: scoreCase, difficultyBand: difficultyBand };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   global.DiagLogic = api;
 })(typeof window !== "undefined" ? window : globalThis);

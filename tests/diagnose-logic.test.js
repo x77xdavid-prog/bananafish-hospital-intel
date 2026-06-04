@@ -32,3 +32,20 @@ test("deriveActiveTags: 치과 유형 → 과목:치과, 방사선:치과", () =
   assert.ok(t.has("과목:치과"));
   assert.ok(t.has("방사선:치과"));
 });
+
+test("scoreCase: 의원 최소 = 1", () => {
+  assert.strictEqual(L.scoreCase(base), 1);
+});
+
+test("scoreCase: 종합병원+입원실+CT+마약류+재생+기존+3층 = 3+1+1+1+1+1+1 = 9", () => {
+  const s = L.scoreCase({ ...base, type:"general", inpatient:20, surgery:"general",
+    radiology:"ct", narcotics:true, regen:true, building:"existing", floors:3 });
+  assert.strictEqual(s, 9);
+});
+
+test("difficultyBand: 경계값", () => {
+  assert.deepStrictEqual(L.difficultyBand(2), { stars:1, label:"수월" });
+  assert.deepStrictEqual(L.difficultyBand(3), { stars:3, label:"주의" });
+  assert.deepStrictEqual(L.difficultyBand(4), { stars:3, label:"주의" });
+  assert.deepStrictEqual(L.difficultyBand(5), { stars:4, label:"까다로움" });
+});
