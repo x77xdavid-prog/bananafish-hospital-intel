@@ -93,11 +93,15 @@
     var applied = window.DiagLogic.matchCheckpoints(a, window.CHECKLIST);
     var top = window.DiagLogic.topConcerns(applied, 3);
 
-    var stars = "";
-    for (var i = 0; i < 5; i++) stars += i < band.stars ? "★" : "☆";
+    var starsHtml = "";
+    for (var i = 0; i < 5; i++) starsHtml += '<i class="dg-star' + (i < band.stars ? " on" : "") + '">★</i>';
 
     var html = ''
-      + '<p class="dg-result__grade">예상 인허가 난이도 <br><span>' + stars + '</span> ' + band.label + '</p>'
+      + '<div class="dg-grade">'
+      +   '<span class="dg-grade__label">예상 인허가 난이도</span>'
+      +   '<span class="dg-stars">' + starsHtml + '</span>'
+      +   '<span class="dg-grade__band band-' + band.stars + '">' + band.label + '</span>'
+      + '</div>'
       + '<p class="dg-result__count">내 케이스에 적용되는 인허가 체크포인트 <strong>' + applied.length + '개</strong></p>';
 
     if (top.length) {
