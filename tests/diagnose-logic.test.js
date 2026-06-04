@@ -37,10 +37,10 @@ test("scoreCase: 의원 최소 = 1", () => {
   assert.strictEqual(L.scoreCase(base), 1);
 });
 
-test("scoreCase: 종합병원+입원실+CT+마약류+재생+기존+3층 = 3+1+1+1+1+1+1 = 9", () => {
+test("scoreCase: 종합병원+입원실+수술+CT+마약류+재생+기존+3층 = 3+1+1+1+1+1+1+1 = 10", () => {
   const s = L.scoreCase({ ...base, type:"general", inpatient:20, surgery:"general",
     radiology:"ct", narcotics:true, regen:true, building:"existing", floors:3 });
-  assert.strictEqual(s, 9);
+  assert.strictEqual(s, 10);
 });
 
 test("difficultyBand: 경계값", () => {

@@ -24,6 +24,7 @@
     var base = { clinic:1, dental:1, oriental:1, nursing:2, hospital:2, general:3 };
     var s = base[a.type] || 1;
     if (a.inpatient && Number(a.inpatient) > 0) s += 1;
+    if (a.surgery && a.surgery !== "none") s += 1;
     if (a.radiology === "ct") s += 1;
     if (a.narcotics) s += 1;
     if (a.regen) s += 1;
