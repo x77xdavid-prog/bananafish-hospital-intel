@@ -6,7 +6,7 @@
 
   // 서버리스 폼 엔드포인트(사용자 설정). 비어 있으면 mailto 폴백 사용.
   var FORM_ENDPOINT = ""; // 예: "https://formspree.io/f/xxxxxx"
-  var FALLBACK_EMAIL = "bansnsfish@naver.com"; // 리드 수신 이메일
+  var FALLBACK_EMAIL = "bananafish@naver.com"; // 리드 수신 이메일
 
   var QUESTIONS = [
     { key:"situation", q:"어떤 상황이세요?", type:"single", options:[
