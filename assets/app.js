@@ -165,12 +165,29 @@
     }
     return m;
   }
+  // 같은 좌표(같은 건물·다른 층) 병원들을 작은 원형으로 분산 — 각각 점으로 보이게
+  var offsetsDone = false;
+  function computeOffsets() {
+    if (offsetsDone) return; offsetsDone = true;
+    var byPos = {};
+    HOSP.forEach(function (h) { var k = h.lat + "," + h.lng; (byPos[k] || (byPos[k] = [])).push(h); });
+    Object.keys(byPos).forEach(function (k) {
+      var arr = byPos[k];
+      if (arr.length <= 1) { arr[0]._dx = 0; arr[0]._dy = 0; return; }
+      var R = 0.00012;  // 약 13m 반경
+      for (var i = 0; i < arr.length; i++) {
+        var ang = 2 * Math.PI * i / arr.length;
+        arr[i]._dx = R * Math.cos(ang);
+        arr[i]._dy = R * Math.sin(ang);
+      }
+    });
+  }
   function getIndivMarker(h) {
     var m = markerById[h.id];
     if (!m) {
       var deep = h._deep, sz = deep ? 18 : 14;
       m = new naver.maps.Marker({
-        position: new naver.maps.LatLng(h.lat, h.lng), title: h.name,
+        position: new naver.maps.LatLng(h.lat + (h._dy || 0), h.lng + (h._dx || 0)), title: h.name,
         icon: { content: '<div class="hmk' + (deep ? " hmk--deep" : "") + '"></div>', anchor: new naver.maps.Point(sz / 2, sz / 2) },
         zIndex: deep ? 100 : 50
       });
@@ -228,6 +245,7 @@
     });
 
     buildGroups();
+    computeOffsets();
     naver.maps.Event.addListener(map, "idle", redraw);
   }
 
@@ -557,7 +575,7 @@
     if (card) {
       bindDeepToggles(card);
       setOpen(card, true);
-      if (map) map.closePopup();
+      if (infoWindow) infoWindow.close();
       card.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   }
