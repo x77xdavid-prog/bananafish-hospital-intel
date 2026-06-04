@@ -500,3 +500,13 @@ details[open] .sources__sum::before { transform: rotate(90deg); }
   .dossier { break-inside: avoid; box-shadow: none; border-color: var(--line-strong); }
   body { background: #fff; }
 }
+
+/* ============ light-glass cohesion (소개·진단 톤 통일) ============ */
+body::before{ content:""; position:fixed; inset:0; z-index:-1; pointer-events:none; background:
+  radial-gradient(34% 26% at 8% 2%, oklch(68% 0.13 250 / .10), transparent 60%),
+  radial-gradient(30% 24% at 94% 5%, oklch(72% 0.10 170 / .08), transparent 62%),
+  radial-gradient(40% 32% at 88% 98%, oklch(70% 0.12 300 / .07), transparent 60%),
+  radial-gradient(34% 28% at 6% 99%, oklch(74% 0.11 40 / .06), transparent 60%); }
+.toolbar{ background: oklch(100% 0 0 / .62); -webkit-backdrop-filter: blur(16px) saturate(160%); backdrop-filter: blur(16px) saturate(160%); }
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))){ .toolbar{ background: var(--bg); } }
+@media (prefers-reduced-motion: reduce){ body::before{ background-attachment: scroll; } }
