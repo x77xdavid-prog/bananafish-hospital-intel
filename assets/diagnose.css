@@ -30,4 +30,5 @@
   width: 100%; padding: .7rem .8rem; border: 1.5px solid #d1d5db; border-radius: 8px; font: inherit; }
 .dg-gate__consent { display: flex; gap: .5rem; align-items: flex-start; margin: 1rem 0; font-size: .8rem; color: #4b5563; }
 .dg-disclaimer { margin-top: 1rem; font-size: .75rem; color: #9ca3af; text-align: center; }
+.dg-restart { margin-top: 1.5rem; text-align: center; }
 @media (prefers-reduced-motion: reduce) { .dg-btn, .dg-progress__bar { transition: none; } }
