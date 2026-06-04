@@ -118,6 +118,11 @@
 
   /* ---------- map (NAVER Dynamic Map) ---------- */
   var map, clusterer, markerById = {}, infoWindow;
+  var curMapRecs = [];
+  var GROUPS = { gu: {}, emd: {} };          // key -> {lat,lng,label}
+  var regionMarkers = { gu: {}, emd: {} };   // key -> naver Marker
+  var GU_MAX_ZOOM = 12;                       // ≤12: 구 / 13~14: 동 / ≥15: 마커 클러스터 (다방식)
+  var EMD_MAX_ZOOM = 14;
   function clusterIcon(cls, px) {
     return { content: '<div class="navclust ' + cls + '"><span>0</span></div>',
              size: new naver.maps.Size(px, px), anchor: new naver.maps.Point(px / 2, px / 2) };
@@ -125,6 +130,53 @@
   function openInfo(h, m) {
     infoWindow.setContent('<div class="navpop">' + popupHtml(h) + "</div>");
     infoWindow.open(map, m);
+  }
+  function regionIcon(label, count) {
+    return { content: '<div class="region-bubble"><b>' + esc(label) + "</b><i>" + fmtNum(count) + "</i></div>",
+             anchor: new naver.maps.Point(0, 0) };
+  }
+  // 구·동 그룹 중심좌표 계산 + 지역 버블 마커 생성
+  function buildGroups() {
+    var acc = { gu: {}, emd: {} };
+    function add(o, k, label, h) { var a = o[k] || (o[k] = { la: 0, ln: 0, n: 0, label: label }); a.la += h.lat; a.ln += h.lng; a.n++; }
+    HOSP.forEach(function (h) {
+      add(acc.gu, h.gu, h.gu, h);
+      if (h.emd) add(acc.emd, h.gu + "|" + h.emd, h.emd, h);
+    });
+    ["gu", "emd"].forEach(function (t) {
+      Object.keys(acc[t]).forEach(function (k) {
+        var a = acc[t][k]; GROUPS[t][k] = { lat: a.la / a.n, lng: a.ln / a.n, label: a.label };
+        var rm = new naver.maps.Marker({ position: new naver.maps.LatLng(GROUPS[t][k].lat, GROUPS[t][k].lng), icon: regionIcon(a.label, 0), zIndex: 200 });
+        rm.setMap(null);
+        naver.maps.Event.addListener(rm, "click", (function (g, tt) {
+          return function () { map.morph(new naver.maps.LatLng(g.lat, g.lng), tt === "gu" ? 14 : 16); };
+        })(GROUPS[t][k], t));
+        regionMarkers[t][k] = rm;
+      });
+    });
+  }
+  // 줌 레벨에 따라 구 집계 → 동 집계 → 마커 클러스터로 전환 (다방식)
+  function applyMapMode(recs) {
+    if (!map || !clusterer) return;
+    var z = map.getZoom();
+    var tier = z <= GU_MAX_ZOOM ? "gu" : (z <= EMD_MAX_ZOOM ? "emd" : "cluster");
+    ["gu", "emd"].forEach(function (t) {
+      if (t !== tier) Object.keys(regionMarkers[t]).forEach(function (k) { regionMarkers[t][k].setMap(null); });
+    });
+    if (tier === "cluster") {
+      var ms = [];
+      for (var j = 0; j < recs.length; j++) { var mm = markerById[recs[j].id]; if (mm) ms.push(mm); }
+      clusterer.setMarkers(ms);
+    } else {
+      clusterer.setMarkers([]);
+      var counts = {};
+      for (var i = 0; i < recs.length; i++) { var h = recs[i]; var k = tier === "gu" ? h.gu : h.gu + "|" + h.emd; counts[k] = (counts[k] || 0) + 1; }
+      Object.keys(regionMarkers[tier]).forEach(function (k) {
+        var rm = regionMarkers[tier][k], c = counts[k] || 0;
+        if (c > 0) { rm.setIcon(regionIcon(GROUPS[tier][k].label, c)); rm.setMap(map); } else rm.setMap(null);
+      });
+    }
+    naver.maps.Event.trigger(map, "idle");
   }
   function initMap() {
     map = new naver.maps.Map("map", {
@@ -162,6 +214,9 @@
         var s = cm.getElement().querySelector("span"); if (s) s.textContent = count;
       }
     });
+
+    buildGroups();
+    naver.maps.Event.addListener(map, "zoom_changed", function () { applyMapMode(curMapRecs); });
   }
 
   function popupHtml(h) {
@@ -179,11 +234,8 @@
 
   function updateMap(recs) {
     if (!clusterer) return;
-    var ms = [];
-    for (var i = 0; i < recs.length; i++) { var m = markerById[recs[i].id]; if (m) ms.push(m); }
-    clusterer.setMarkers(ms);
-    // MarkerClustering의 KVO가 'markers' 변경을 redraw하지 않으므로 idle을 강제 트리거
-    if (map) naver.maps.Event.trigger(map, "idle");
+    curMapRecs = recs;
+    applyMapMode(recs);
     el("mapCount").textContent = fmtNum(recs.length);
   }
 
