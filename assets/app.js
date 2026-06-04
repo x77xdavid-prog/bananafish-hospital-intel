@@ -51,15 +51,20 @@
   /* ---------- state ---------- */
   var state = { q: "", sidos: {}, types: {}, era: "all", sort: "name", page: 1 };
   var PAGE_SIZE = 50;
+  // 검색어 토큰(공백 분리, AND 매칭) — refresh() 시점에 1회 계산
+  var qTokens = [];
 
   // 검색 인덱스 캐시
   HOSP.forEach(function (h) {
     h._s = (h.name + " " + h.addr + " " + h.gu + " " + deptNames(h).join(" ")).toLowerCase();
     h._deep = !!DEEP[h.id];
+    h._dn = displayName(h); // 정렬키 = 화면 표시명(접두 제거/심층 오버라이드 반영)
   });
 
   function matches(h) {
-    if (state.q && h._s.indexOf(state.q) === -1) return false;
+    for (var qi = 0; qi < qTokens.length; qi++) {
+      if (h._s.indexOf(qTokens[qi]) === -1) return false;
+    }
     if (hasKeys(state.sidos) && !state.sidos[h.sido]) return false;
     if (hasKeys(state.types) && !state.types[h.cl]) return false;
     if (state.era !== "all") {
@@ -80,8 +85,8 @@
   function sortRecs(recs) {
     var s = state.sort;
     var c = recs.slice();
-    if (s === "name") c.sort(function (a, b) { return a.name.localeCompare(b.name, "ko"); });
-    else if (s === "dr_desc") c.sort(function (a, b) { return (b.dr - a.dr) || a.name.localeCompare(b.name, "ko"); });
+    if (s === "name") c.sort(function (a, b) { return a._dn.localeCompare(b._dn, "ko"); });
+    else if (s === "dr_desc") c.sort(function (a, b) { return (b.dr - a.dr) || a._dn.localeCompare(b._dn, "ko"); });
     else if (s === "open_desc") c.sort(function (a, b) { return cmpOpen(b.open, a.open); });
     else if (s === "open_asc") c.sort(function (a, b) { return cmpOpen(a.open, b.open); });
     return c;
@@ -263,9 +268,10 @@
     var depts = deptNames(h, 4).join(" · ") || "—";
     var tag = h._deep ? '<span class="pop__tag">심층</span>' : "";
     var btn = h._deep
-      ? '<a class="pop__btn" href="#deep-' + h.id + '" data-deepgo="' + h.id + '">심층 도시에 보기 →</a>'
+      ? '<a class="pop__btn" href="#deep-' + h.id + '" data-deepgo="' + h.id + '">자세히 보기 →</a>'
       : (h.url ? '<a class="pop__btn" href="' + esc(h.url) + '" target="_blank" rel="noopener">홈페이지 →</a>' : "");
-    return '<div class="pop__name">' + esc(displayName(h)) + tag + "</div>" +
+    return '<button type="button" class="pop__close" aria-label="닫기">×</button>' +
+      '<div class="pop__name">' + esc(displayName(h)) + tag + "</div>" +
       '<div class="pop__meta">' + esc(h.cl) + " · " + esc(h.gu) + (h.open ? " · 개원 " + esc(h.open) : "") + "</div>" +
       '<div class="pop__row"><b>진료</b> ' + esc(depts) + "</div>" +
       '<div class="pop__row"><b>의사</b> ' + fmtNum(h.dr) + "명" + (h.tel ? ' · <b>☎</b> ' + esc(h.tel) : "") + "</div>" +
@@ -369,7 +375,7 @@
     });
     var host = el("deepList");
     if (!ids.length) {
-      host.innerHTML = '<p class="empty-state">심층 도시에는 순차적으로 추가됩니다.</p>';
+      host.innerHTML = '<p class="empty-state">심층 분석은 순차적으로 추가됩니다.</p>';
       return;
     }
     var n = 0;
@@ -379,7 +385,7 @@
       n++;
       host.appendChild(deepCard(h, d, n));
     });
-    if (!n) host.innerHTML = '<p class="empty-state">현재 필터에 해당하는 심층 도시에가 없습니다.</p>';
+    if (!n) host.innerHTML = '<p class="empty-state">현재 필터에 해당하는 심층 분석이 없습니다.</p>';
   }
 
   function deepCard(h, d, idx) {
@@ -493,6 +499,7 @@
 
   function refresh(resetPage) {
     if (resetPage) state.page = 1;
+    qTokens = state.q ? state.q.split(/\s+/).filter(Boolean) : [];
     renderDirectory();
     // deep: re-render under filter
     el("deepList").innerHTML = "";
@@ -502,10 +509,53 @@
 
   function bindToolbar() {
     var s = el("search"), deb;
+    // 최근 검색어(구글식) — localStorage 저장, 시계 아이콘, 항목별 × 삭제
+    var HIST_KEY = "bf_search_hist", HIST_MAX = 8;
+    var histBox = document.createElement("div");
+    histBox.className = "search-hist"; histBox.id = "searchHist"; histBox.hidden = true;
+    s.parentNode.appendChild(histBox); // .searchbox 는 position:relative
+
+    function loadHist() { try { var a = JSON.parse(localStorage.getItem(HIST_KEY)); return Array.isArray(a) ? a : []; } catch (e) { return []; } }
+    function saveHist(a) { try { localStorage.setItem(HIST_KEY, JSON.stringify(a.slice(0, HIST_MAX))); } catch (e) {} }
+    function addHist(term) { term = term.trim(); if (!term) return; var a = loadHist().filter(function (t) { return t !== term; }); a.unshift(term); saveHist(a); }
+    function delHist(term) { saveHist(loadHist().filter(function (t) { return t !== term; })); }
+    function renderHist() {
+      var typed = s.value.trim().toLowerCase();
+      var items = loadHist().filter(function (t) { return !typed || t.toLowerCase().indexOf(typed) !== -1; });
+      if (!items.length) { histBox.hidden = true; histBox.innerHTML = ""; return; }
+      histBox.innerHTML = items.map(function (t) {
+        return '<div class="sh-row"><button type="button" class="sh-pick" data-term="' + esc(t) + '">' +
+          '<svg class="sh-clock" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 7v5l3 2M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>' +
+          '<span class="sh-term">' + esc(t) + '</span></button>' +
+          '<button type="button" class="sh-del" data-del="' + esc(t) + '" aria-label="삭제">×</button></div>';
+      }).join("");
+      histBox.hidden = false;
+    }
+    function commitSearch(term) {
+      term = String(term).trim();
+      s.value = term; addHist(term);
+      histBox.hidden = true;
+      if (term) el("directorySection").scrollIntoView({ behavior: "smooth", block: "start" });
+      state.q = term.toLowerCase(); refresh(true);
+    }
+
     s.addEventListener("input", function () {
       clearTimeout(deb);
       deb = setTimeout(function () { state.q = s.value.trim().toLowerCase(); refresh(true); }, 130);
+      renderHist();
     });
+    s.addEventListener("focus", renderHist);
+    s.addEventListener("keydown", function (e) {
+      if (e.key === "Enter") { e.preventDefault(); commitSearch(s.value); }
+      else if (e.key === "Escape") { histBox.hidden = true; }
+    });
+    histBox.addEventListener("mousedown", function (e) { // mousedown: input blur 이전에 처리
+      var del = e.target.closest(".sh-del");
+      if (del) { e.preventDefault(); delHist(del.dataset.del); renderHist(); s.focus(); return; }
+      var pick = e.target.closest(".sh-pick");
+      if (pick) { e.preventDefault(); commitSearch(pick.dataset.term); }
+    });
+    document.addEventListener("click", function (e) { if (!e.target.closest(".searchbox")) histBox.hidden = true; });
 
     el("filterbar").addEventListener("click", function (e) {
       var c = e.target.closest(".filter-chip"); if (!c) return;
@@ -542,6 +592,13 @@
     document.addEventListener("click", function (e) {
       var a = e.target.closest("[data-deepgo]"); if (!a) return;
       e.preventDefault(); gotoDeep(a.dataset.deepgo);
+    });
+
+    // popup 닫기(×)
+    document.addEventListener("click", function (e) {
+      if (!e.target.closest(".pop__close")) return;
+      e.preventDefault(); e.stopPropagation();
+      if (infoWindow) infoWindow.close();
     });
 
     // to-top

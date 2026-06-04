@@ -164,6 +164,15 @@ em { font-style: normal; }
 }
 .searchbox__input::placeholder { color: var(--ink-ghost); }
 .searchbox__input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); }
+.search-hist { position: absolute; top: calc(100% + 6px); left: 0; right: 0; z-index: 50; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-md); box-shadow: var(--shadow-pop); padding: .35rem; max-height: 340px; overflow-y: auto; }
+.sh-row { display: flex; align-items: center; }
+.sh-row + .sh-row { border-top: 1px solid var(--line-soft, rgba(0,0,0,.04)); }
+.sh-pick { flex: 1 1 auto; min-width: 0; display: flex; align-items: center; gap: .6rem; background: transparent; border: 0; padding: .55rem .6rem; border-radius: 8px; font: inherit; color: var(--ink); text-align: left; cursor: pointer; }
+.sh-pick:hover { background: var(--accent-soft); }
+.sh-clock { width: 15px; height: 15px; fill: none; stroke: var(--ink-faint); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.sh-term { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sh-del { flex: none; width: 1.7rem; height: 1.7rem; border: 0; background: transparent; color: var(--ink-faint); font-size: 1.15rem; line-height: 1; border-radius: 6px; cursor: pointer; transition: background .15s ease, color .15s ease; }
+.sh-del:hover { background: var(--accent-soft); color: var(--ink); }
 
 .toolbar__right { display: flex; align-items: center; gap: .8rem; margin-left: auto; }
 .result-count { font-family: var(--font-mono); font-size: var(--t-xs); color: var(--ink-faint); white-space: nowrap; }
@@ -205,7 +214,10 @@ em { font-style: normal; }
 .map-note a { color: var(--ink-faint); border-bottom: 1px dotted var(--line-strong); }
 
 /* NAVER 지도 — 팝업(InfoWindow) + 클러스터 */
-.navpop { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-md); box-shadow: var(--shadow-pop); padding: .85rem 1rem; min-width: 220px; max-width: 280px; font-family: var(--font-sans); line-height: 1.5; }
+.navpop { position: relative; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-md); box-shadow: var(--shadow-pop); padding: .85rem 1rem; min-width: 220px; max-width: 280px; font-family: var(--font-sans); line-height: 1.5; }
+.pop__close { position: absolute; top: .4rem; right: .45rem; width: 1.6rem; height: 1.6rem; display: flex; align-items: center; justify-content: center; border: 0; border-radius: 50%; background: transparent; color: var(--ink-faint); font-size: 1.25rem; line-height: 1; cursor: pointer; transition: background .15s ease, color .15s ease; }
+.pop__close:hover { background: var(--accent-soft); color: var(--ink); }
+.pop__name { padding-right: 1.4rem; }
 .navclust { display: grid; place-items: center; border-radius: 50%; color: #fff; font-family: var(--font-mono); font-weight: 700; cursor: pointer; font-variant-numeric: tabular-nums; background: oklch(53% 0.17 262 / .92); border: 3px solid oklch(53% 0.17 262 / .3); box-shadow: 0 4px 14px -4px oklch(53% 0.17 262 / .6); transition: transform var(--dur-fast); }
 .navclust:hover { transform: scale(1.08); }
 .navclust.c1 { width: 38px; height: 38px; font-size: .74rem; }
