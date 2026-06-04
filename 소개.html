@@ -120,6 +120,23 @@
       .marquee__track{animation:none;}
       .marquee{overflow-x:auto; -webkit-mask-image:none; mask-image:none;}
     }
+
+    /* ---- 배경 조절 패널 ---- */
+    .tuner{ position:fixed; top:14px; right:14px; z-index:60; width:228px; font-size:.8rem;
+      background:rgba(255,255,255,.74); -webkit-backdrop-filter:blur(16px) saturate(160%); backdrop-filter:blur(16px) saturate(160%);
+      border:1px solid var(--line); border-radius:14px; box-shadow:0 16px 40px -20px rgba(28,40,80,.35); color:var(--ink); }
+    .tuner__head{ display:flex; align-items:center; justify-content:space-between; padding:.6rem .85rem; cursor:pointer; font-weight:800; user-select:none; }
+    .tuner__head .ar{ color:var(--ink-faint); transition:transform .2s ease; }
+    .tuner.collapsed .tuner__head .ar{ transform:rotate(-90deg); }
+    .tuner__body{ padding:.1rem .85rem .85rem; display:grid; gap:.65rem; }
+    .tuner.collapsed .tuner__body{ display:none; }
+    .tuner__row label{ display:flex; justify-content:space-between; font-size:.74rem; color:var(--ink-soft); margin-bottom:.18rem; }
+    .tuner__row label b{ color:var(--blue-deep); font-variant-numeric:tabular-nums; font-weight:700; }
+    .tuner input[type=range]{ width:100%; accent-color:var(--blue-deep); margin:0; }
+    .tuner__btns{ display:flex; gap:.4rem; margin-top:.25rem; }
+    .tuner__btns button{ flex:1; font:inherit; font-size:.74rem; font-weight:700; padding:.45rem .3rem; border-radius:8px; border:1px solid var(--line); background:#fff; color:var(--blue-deep); cursor:pointer; }
+    .tuner__btns button:hover{ background:var(--blue-soft); }
+    @media (max-width:560px){ .tuner{ width:46vw; min-width:180px; top:auto; bottom:12px; right:10px; } }
   </style>
 </head>
 <body>
@@ -247,46 +264,97 @@
     })();
   </script>
 
-  <!-- 인터랙티브 배경: 마우스 따라 색감 블롭이 자연스럽게 이동 + 은은한 색 변화 -->
+  <!-- 배경 조절 패널 -->
+  <aside class="tuner" id="tuner" aria-label="배경 조절">
+    <div class="tuner__head" id="tunerHead"><span>배경 조절</span><span class="ar">▾</span></div>
+    <div class="tuner__body">
+      <div class="tuner__row"><label>색 진하기 <b id="vOpacity"></b></label><input type="range" id="sOpacity" min="0.05" max="0.85" step="0.01"></div>
+      <div class="tuner__row"><label>블러(부드러움) <b id="vBlur"></b></label><input type="range" id="sBlur" min="20" max="120" step="1"></div>
+      <div class="tuner__row"><label>크기 <b id="vScale"></b></label><input type="range" id="sScale" min="0.6" max="1.8" step="0.05"></div>
+      <div class="tuner__row"><label>마우스 반응 <b id="vDepth"></b></label><input type="range" id="sDepth" min="0" max="3" step="0.05"></div>
+      <div class="tuner__row"><label>흐름 속도 <b id="vSpeed"></b></label><input type="range" id="sSpeed" min="0" max="3" step="0.05"></div>
+      <div class="tuner__row"><label>색 변화 <b id="vHue"></b></label><input type="range" id="sHue" min="0" max="50" step="1"></div>
+      <div class="tuner__btns"><button id="tCopy" type="button">설정 복사</button><button id="tReset" type="button">기본값</button></div>
+    </div>
+  </aside>
+
+  <!-- 인터랙티브 배경: 마우스 따라 블롭 이동 + 색 변화, 슬라이더로 실시간 조절 -->
   <script>
   (function(){
-    var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     var blobs = Array.prototype.slice.call(document.querySelectorAll(".blob"));
     var bg = document.querySelector(".bg");
     if (!blobs.length) return;
-    if (reduce) return; // 모션 최소화 설정 시 정지
+    var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    // 블롭별 깊이/자동드리프트 파라미터 (시차 효과)
+    var DEFAULTS = { opacity:0.32, blur:70, scale:1, depthMul:1, speedMul:1, hueRange:14 };
+    var P;
+    try { var s = JSON.parse(localStorage.getItem("bf_bg_tune")); P = s ? Object.assign({}, DEFAULTS, s) : Object.assign({}, DEFAULTS); }
+    catch (e) { P = Object.assign({}, DEFAULTS); }
+    function save(){ try { localStorage.setItem("bf_bg_tune", JSON.stringify(P)); } catch (e) {} }
+
     var conf = blobs.map(function(_, i){
       return { depth: 30 + i*18, sx: 0.00020 + i*0.00006, sy: 0.00026 + i*0.00005,
                ax: 24 + i*8, ay: 20 + i*7, dir: (i % 2 ? -1 : 1), cx: 0, cy: 0 };
     });
-    var tx = 0, ty = 0;      // 마우스 목표(-1..1)
-    var hue = 0, hueT = 0;   // 배경 색조 변화
+    var tx = 0, ty = 0, hue = 0, hueT = 0;
 
-    function onMove(x, y){
-      tx = (x / window.innerWidth) * 2 - 1;
-      ty = (y / window.innerHeight) * 2 - 1;
-      hueT = tx * 14;        // 마우스 좌우로 ±14deg 은은한 색 변화
+    function applyStatic(){
+      blobs.forEach(function(b){ b.style.opacity = P.opacity; b.style.filter = "blur(" + P.blur + "px)"; });
+      if (reduce) blobs.forEach(function(b){ b.style.transform = "scale(" + P.scale + ")"; });
     }
-    window.addEventListener("pointermove", function(e){ onMove(e.clientX, e.clientY); }, { passive:true });
+    window.addEventListener("pointermove", function(e){
+      tx = (e.clientX / window.innerWidth) * 2 - 1;
+      ty = (e.clientY / window.innerHeight) * 2 - 1;
+      hueT = tx * P.hueRange;
+    }, { passive:true });
 
     function frame(t){
       for (var i = 0; i < blobs.length; i++){
         var c = conf[i];
-        var driftX = Math.sin(t * c.sx) * c.ax;        // 마우스 없어도 천천히 흐름
-        var driftY = Math.cos(t * c.sy) * c.ay;
-        var mx = tx * c.depth * c.dir;                 // 마우스 시차
-        var my = ty * c.depth;
-        c.cx += (mx - c.cx) * 0.045;                   // 부드러운 보간(lerp)
-        c.cy += (my - c.cy) * 0.045;
-        blobs[i].style.transform = "translate3d(" + (driftX + c.cx).toFixed(1) + "px," + (driftY + c.cy).toFixed(1) + "px,0)";
+        var driftX = Math.sin(t * c.sx * P.speedMul) * c.ax;
+        var driftY = Math.cos(t * c.sy * P.speedMul) * c.ay;
+        var mx = tx * c.depth * P.depthMul * c.dir, my = ty * c.depth * P.depthMul;
+        c.cx += (mx - c.cx) * 0.045; c.cy += (my - c.cy) * 0.045;
+        blobs[i].style.transform = "translate3d(" + (driftX + c.cx).toFixed(1) + "px," + (driftY + c.cy).toFixed(1) + "px,0) scale(" + P.scale + ")";
       }
       hue += (hueT - hue) * 0.035;
       if (bg) bg.style.filter = "hue-rotate(" + hue.toFixed(2) + "deg)";
       requestAnimationFrame(frame);
     }
-    requestAnimationFrame(frame);
+    applyStatic();
+    if (!reduce) requestAnimationFrame(frame);
+
+    /* ----- 슬라이더 패널 연결 ----- */
+    var rows = [
+      ["sOpacity","vOpacity","opacity", function(v){ return (+v).toFixed(2); }],
+      ["sBlur","vBlur","blur", function(v){ return Math.round(v) + "px"; }],
+      ["sScale","vScale","scale", function(v){ return (+v).toFixed(2) + "x"; }],
+      ["sDepth","vDepth","depthMul", function(v){ return (+v).toFixed(2) + "x"; }],
+      ["sSpeed","vSpeed","speedMul", function(v){ return (+v).toFixed(2) + "x"; }],
+      ["sHue","vHue","hueRange", function(v){ return Math.round(v) + "°"; }]
+    ];
+    function syncUI(){
+      rows.forEach(function(r){ var sl=document.getElementById(r[0]), vw=document.getElementById(r[1]); if(!sl) return; sl.value=P[r[2]]; vw.textContent=r[3](P[r[2]]); });
+    }
+    rows.forEach(function(r){
+      var sl = document.getElementById(r[0]); if (!sl) return;
+      sl.addEventListener("input", function(){
+        P[r[2]] = parseFloat(sl.value);
+        document.getElementById(r[1]).textContent = r[3](sl.value);
+        applyStatic(); save();
+      });
+    });
+    var head = document.getElementById("tunerHead"), tuner = document.getElementById("tuner");
+    if (head && tuner) head.addEventListener("click", function(){ tuner.classList.toggle("collapsed"); });
+    var copyBtn = document.getElementById("tCopy");
+    if (copyBtn) copyBtn.addEventListener("click", function(){
+      var txt = JSON.stringify(P);
+      if (navigator.clipboard) navigator.clipboard.writeText(txt);
+      copyBtn.textContent = "복사됨!"; setTimeout(function(){ copyBtn.textContent = "설정 복사"; }, 1200);
+    });
+    var resetBtn = document.getElementById("tReset");
+    if (resetBtn) resetBtn.addEventListener("click", function(){ P = Object.assign({}, DEFAULTS); save(); applyStatic(); syncUI(); });
+    syncUI();
   })();
   </script>
 </body>
