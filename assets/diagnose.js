@@ -85,7 +85,51 @@
   function advance() { if (state.idx < QUESTIONS.length - 1) { state.idx++; renderStep(); } else { finish(); } }
   function back() { if (state.idx > 0) { state.idx--; renderStep(); } }
 
-  function finish() { /* Task 7에서 구현 */ window.__dgFinish && window.__dgFinish(state.answers); }
+  function finish() {
+    $("dgBar").style.width = "100%";
+    var a = state.answers;
+    var score = window.DiagLogic.scoreCase(a);
+    var band = window.DiagLogic.difficultyBand(score);
+    var applied = window.DiagLogic.matchCheckpoints(a, window.CHECKLIST);
+    var top = window.DiagLogic.topConcerns(applied, 3);
+
+    var stars = "";
+    for (var i = 0; i < 5; i++) stars += i < band.stars ? "★" : "☆";
+
+    var html = ''
+      + '<p class="dg-result__grade">예상 인허가 난이도 <br><span>' + stars + '</span> ' + band.label + '</p>'
+      + '<p class="dg-result__count">내 케이스에 적용되는 인허가 체크포인트 <strong>' + applied.length + '개</strong></p>';
+
+    if (top.length) {
+      html += '<div class="dg-top"><h3>먼저 챙겨야 할 주의 항목</h3><ul>';
+      top.forEach(function (t) { html += "<li>" + escapeHtml(t.text) + "</li>"; });
+      html += "</ul></div>";
+    }
+
+    html += renderGate();
+    html += '<p class="dg-disclaimer">본 결과는 참고용 1차 진단이며, 최종 적용 기준은 관할기관(보건소·소방서·구청) 협의로 확정됩니다.</p>';
+
+    $("dgQuiz").hidden = true;
+    var r = $("dgResult"); r.hidden = false; r.innerHTML = html;
+    bindGate(applied, band, score);
+    r.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function escapeHtml(s) { return String(s).replace(/[&<>"]/g, function (c) {
+    return { "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" }[c]; }); }
+
+  function renderGate() {
+    return ''
+      + '<form class="dg-gate" id="dgGate" novalidate>'
+      + '<h3>전체 맞춤 체크리스트 PDF + 무료 1차 검토 받기</h3>'
+      + '<label for="gName">성함</label><input type="text" id="gName" name="name" required autocomplete="name" />'
+      + '<label for="gPhone">연락처</label><input type="tel" id="gPhone" name="phone" required autocomplete="tel" placeholder="010-0000-0000" />'
+      + '<label for="gEmail">이메일</label><input type="email" id="gEmail" name="email" required autocomplete="email" />'
+      + '<label class="dg-gate__consent"><input type="checkbox" id="gConsent" required /> <span>개인정보 수집·이용(상담 목적)에 동의합니다.</span></label>'
+      + '<button type="submit" class="dg-btn dg-btn--primary" id="gSubmit">맞춤 체크리스트 받기</button>'
+      + '<p class="dg-gate__msg" id="gMsg" aria-live="polite"></p>'
+      + "</form>";
+  }
 
   function bind() {
     $("dgStart").addEventListener("click", start);
