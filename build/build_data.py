@@ -132,12 +132,20 @@ from collections import Counter
 cl_cnt = Counter(d["cl"] for d in recs)
 gu_cnt = Counter(d["gu"] for d in recs)
 
+# 수록 범위 라벨 — 설정된 범위에서 자동 도출(하드코딩 금지)
+if TARGET_GU:
+    REGION = (TARGET_SIDO or "") + " " + " · ".join(sorted(TARGET_GU))
+elif TARGET_SIDO:
+    REGION = TARGET_SIDO + " 전체"
+else:
+    REGION = "전국 " + str(len({d["sido"] for d in recs})) + "개 시도"
+
 META = {
     "source": SRC_LABEL,
     "license": "공공누리 출처표시(제1유형) · 영리·가공 허용",
     "version": DATA_VER,
-    "region": "서울 " + " · ".join(sorted(TARGET_GU)) if TARGET_GU else "서울 전체",
-    "generated": "2026-06-04",
+    "region": REGION,
+    "generated": datetime.date.today().isoformat(),  # 빌드 시각 자동 기록
     "total": len(recs),
     "byType": dict(cl_cnt.most_common()),
     "byGu": dict(gu_cnt.most_common()),

@@ -589,17 +589,19 @@
     });
 
     // popup → deep link
+    // ⚠ 네이버 지도 InfoWindow는 콘텐츠 클릭의 버블링을 내부에서 막는다(지도 클릭 닫기와 격리 목적).
+    //    따라서 document 위임 핸들러는 반드시 capture 단계(3번째 인자 true)로 등록해야 동작한다.
     document.addEventListener("click", function (e) {
       var a = e.target.closest("[data-deepgo]"); if (!a) return;
       e.preventDefault(); gotoDeep(a.dataset.deepgo);
-    });
+    }, true);
 
-    // popup 닫기(×)
+    // popup 닫기(×) — 위와 동일한 이유로 capture 단계에서 위임 처리
     document.addEventListener("click", function (e) {
       if (!e.target.closest(".pop__close")) return;
       e.preventDefault(); e.stopPropagation();
       if (infoWindow) infoWindow.close();
-    });
+    }, true);
 
     // to-top
     var toTop = el("toTop");
@@ -668,6 +670,7 @@
       else if (k === "deep") n.textContent = deepCount;
       else if (k === "version") n.textContent = META.version || "";
       else if (k === "generated") n.textContent = META.generated || "";
+      else if (k === "region") n.textContent = META.region || n.textContent;
     });
 
     buildFilters();
