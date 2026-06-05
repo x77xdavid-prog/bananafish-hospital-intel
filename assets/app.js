@@ -128,6 +128,7 @@
   var regionMarkers = { sido: {}, gu: {}, emd: {} }; // key -> naver Marker (지연 생성·캐시)
   var shownRegion = [];                              // 현재 표시 중인 지역 버블
   var MARKER_CAP = 3000;                             // 클러스터 단계 viewport 마커 상한
+  var SEARCH_PIN_MAX = 500;                          // 결과가 이 이하이면 줌과 무관하게 개별 핀 표시
   function tierFor(z) { return z <= 9 ? "sido" : z <= 11 ? "gu" : z <= 13 ? "emd" : "cluster"; }
   function groupKey(tier, h) {
     return tier === "sido" ? h.sido : tier === "gu" ? h.sido + "|" + h.gu : h.sido + "|" + h.gu + "|" + h.emd;
@@ -206,6 +207,8 @@
     if (!map || !clusterer) return;
     var b = map.getBounds(); if (!b) return;
     var recs = curMapRecs, tier = tierFor(map.getZoom());
+    // 검색·필터로 결과가 적으면 지역 버블 대신 개별 핀으로 표시(줌 무관)
+    if (recs.length && recs.length <= SEARCH_PIN_MAX) tier = "cluster";
     shownRegion.forEach(function (m) { m.setMap(null); }); shownRegion = [];
     if (tier === "cluster") {
       var ms = [];
@@ -291,6 +294,27 @@
     map.setCenter(new naver.maps.LatLng(h.lat, h.lng));
     map.setZoom(17);
     setTimeout(function () { openInfo(h, getIndivMarker(h)); }, 360);
+  }
+
+  // 검색/필터 결과를 지도에 표시 — 단일은 해당 병원으로(팝업까지), 다수는 결과 범위로 맞춤
+  function fitMapToRecs(recs) {
+    if (!map || !recs || !recs.length) return;
+    var minLat = 90, maxLat = -90, minLng = 180, maxLng = -180, n = 0;
+    for (var i = 0; i < recs.length && i < 2000; i++) {
+      var h = recs[i];
+      if (typeof h.lat !== "number" || typeof h.lng !== "number") continue;
+      if (h.lat < minLat) minLat = h.lat; if (h.lat > maxLat) maxLat = h.lat;
+      if (h.lng < minLng) minLng = h.lng; if (h.lng > maxLng) maxLng = h.lng; n++;
+    }
+    if (!n) return;
+    map.fitBounds(new naver.maps.LatLngBounds(
+      new naver.maps.LatLng(minLat, minLng), new naver.maps.LatLng(maxLat, maxLng)));
+  }
+  function showOnMap(recs) {
+    if (!map || !recs || !recs.length) return;
+    if (recs.length === 1) { focusHospital(recs[0]); return; }   // 단일: 이동+팝업
+    document.querySelector(".mapsection").scrollIntoView({ behavior: "smooth", block: "start" });
+    fitMapToRecs(recs);
   }
 
   /* ---------- directory ---------- */
@@ -535,8 +559,8 @@
       term = String(term).trim();
       s.value = term; addHist(term);
       histBox.hidden = true;
-      if (term) el("directorySection").scrollIntoView({ behavior: "smooth", block: "start" });
       state.q = term.toLowerCase(); refresh(true);
+      if (term) showOnMap(curMapRecs);   // 검색 결과를 지도에도 표시
     }
 
     // ── 자동완성: 병원 이름 매칭 추천 (네이버식) ──────────────────
