@@ -539,17 +539,80 @@
       state.q = term.toLowerCase(); refresh(true);
     }
 
+    // ── 자동완성: 병원 이름 매칭 추천 (네이버식) ──────────────────
+    var SUGGEST_MAX = 10, sgList = [], sgActive = -1, nameIndex = null;
+    function buildNameIndex() {
+      nameIndex = HOSP.map(function (h) { return { h: h, lc: (displayName(h) || "").toLowerCase() }; });
+    }
+    function searchHits(typed) {
+      typed = typed.trim().toLowerCase();
+      if (!typed) return [];
+      if (!nameIndex) buildNameIndex();
+      var pre = [], sub = [];                       // prefix 우선 → substring
+      for (var i = 0; i < nameIndex.length; i++) {
+        if (pre.length >= SUGGEST_MAX && sub.length >= SUGGEST_MAX) break;
+        var idx = nameIndex[i].lc.indexOf(typed);
+        if (idx === 0) { if (pre.length < SUGGEST_MAX) pre.push(nameIndex[i].h); }
+        else if (idx > 0) { if (sub.length < SUGGEST_MAX) sub.push(nameIndex[i].h); }
+      }
+      return pre.concat(sub).slice(0, SUGGEST_MAX);
+    }
+    function hlName(name, typed) {                   // 일치 부분 굵게
+      var lc = name.toLowerCase(), t = typed.trim().toLowerCase(), i = t ? lc.indexOf(t) : -1;
+      if (i < 0) return esc(name);
+      return esc(name.slice(0, i)) + "<b>" + esc(name.slice(i, i + t.length)) + "</b>" + esc(name.slice(i + t.length));
+    }
+    function renderSuggest() {
+      var typed = s.value.trim();
+      sgList = searchHits(typed); sgActive = -1;
+      if (!sgList.length) { histBox.hidden = true; histBox.innerHTML = ""; return; }
+      histBox.innerHTML = sgList.map(function (h) {
+        var nm = displayName(h);
+        var meta = esc(h.gu || "") + (h.cl ? " · " + esc(h.cl) : "");
+        return '<div class="sh-row sg-row">' +
+          '<button type="button" class="sh-pick sg-pick" data-id="' + esc(h.id) + '">' +
+          '<svg class="sh-search" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 21l-4.3-4.3M19 11a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z"/></svg>' +
+          '<span class="sg-name">' + hlName(nm, typed) + '</span>' +
+          '<span class="sg-meta">' + meta + '</span></button>' +
+          '<button type="button" class="sh-del sg-fill" data-fill="' + esc(nm) + '" aria-label="입력창에 넣기">↖</button></div>';
+      }).join("");
+      histBox.hidden = false;
+    }
+    function renderDrop() { if (s.value.trim()) renderSuggest(); else renderHist(); }
+    function pickHospital(id) {                      // 추천 클릭 → 해당 병원으로 바로 이동
+      var h = byId[id]; if (!h) return;
+      addHist(displayName(h)); histBox.hidden = true;
+      if (h._deep) gotoDeep(h.id); else focusHospital(h);
+    }
+    function setActive(n) {                          // 키보드 ↑/↓ 활성 행
+      var rows = histBox.querySelectorAll(".sg-row");
+      if (!rows.length) { sgActive = -1; return; }
+      sgActive = (n + rows.length) % rows.length;
+      rows.forEach(function (r, i) { r.classList.toggle("is-active", i === sgActive); });
+    }
+
     s.addEventListener("input", function () {
       clearTimeout(deb);
       deb = setTimeout(function () { state.q = s.value.trim().toLowerCase(); refresh(true); }, 130);
-      renderHist();
+      renderDrop();
     });
-    s.addEventListener("focus", renderHist);
+    s.addEventListener("focus", renderDrop);
     s.addEventListener("keydown", function (e) {
-      if (e.key === "Enter") { e.preventDefault(); commitSearch(s.value); }
-      else if (e.key === "Escape") { histBox.hidden = true; }
+      var hasSug = !histBox.hidden && sgList.length > 0;
+      if (e.key === "ArrowDown" && hasSug) { e.preventDefault(); setActive(sgActive + 1); }
+      else if (e.key === "ArrowUp" && hasSug) { e.preventDefault(); setActive(sgActive - 1); }
+      else if (e.key === "Enter") {
+        e.preventDefault();
+        if (hasSug && sgActive >= 0 && sgList[sgActive]) pickHospital(sgList[sgActive].id);
+        else commitSearch(s.value);
+      }
+      else if (e.key === "Escape") { histBox.hidden = true; sgActive = -1; }
     });
     histBox.addEventListener("mousedown", function (e) { // mousedown: input blur 이전에 처리
+      var fill = e.target.closest(".sg-fill");
+      if (fill) { e.preventDefault(); s.value = fill.dataset.fill; renderSuggest(); s.focus(); return; }
+      var sg = e.target.closest(".sg-pick");
+      if (sg) { e.preventDefault(); pickHospital(sg.dataset.id); return; }
       var del = e.target.closest(".sh-del");
       if (del) { e.preventDefault(); delHist(del.dataset.del); renderHist(); s.focus(); return; }
       var pick = e.target.closest(".sh-pick");

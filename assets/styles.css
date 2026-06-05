@@ -173,6 +173,13 @@ em { font-style: normal; }
 .sh-term { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .sh-del { flex: none; width: 1.7rem; height: 1.7rem; border: 0; background: transparent; color: var(--ink-faint); font-size: 1.15rem; line-height: 1; border-radius: 6px; cursor: pointer; transition: background .15s ease, color .15s ease; }
 .sh-del:hover { background: var(--accent-soft); color: var(--ink); }
+/* 자동완성 추천(병원 이름) */
+.sh-search { width: 15px; height: 15px; fill: none; stroke: var(--ink-faint); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.sg-name { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sg-name b { font-weight: 700; color: var(--accent, var(--ink)); }
+.sg-meta { flex: none; margin-left: .55rem; font-size: .78rem; color: var(--ink-faint); white-space: nowrap; }
+.sg-row.is-active .sg-pick { background: var(--accent-soft); }
+.sg-fill { font-size: 1.05rem; }
 
 .toolbar__right { display: flex; align-items: center; gap: .8rem; margin-left: auto; }
 .result-count { font-family: var(--font-mono); font-size: var(--t-xs); color: var(--ink-faint); white-space: nowrap; }
