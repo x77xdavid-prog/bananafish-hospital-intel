@@ -8,11 +8,14 @@
   <!-- 배포 후: 아래 content에 OCR 백엔드 URL을 입력하면 라이브 사이트에서도 인식이 동작합니다.
        예) content="https://<HF사용자>-doc-ocr.hf.space"  (끝에 / 없이). 비워두면 로컬 백엔드 사용. -->
   <meta name="ocr-backend" content="" />
+  <!-- 서버에 OCR_API_KEY를 설정했다면, 운영용으로만 배포하는 페이지에서 같은 토큰을 입력.
+       (공개 페이지엔 넣지 말 것 — 토큰이 노출됨) -->
+  <meta name="ocr-api-key" content="" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23344e9b'/%3E%3Cpath d='M16 7v18M7 16h18' stroke='white' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" />
   <link rel="stylesheet" href="assets/styles.css?v=n14" />
-  <link rel="stylesheet" href="assets/doc-analyze.css?v=da5" />
+  <link rel="stylesheet" href="assets/doc-analyze.css?v=da7" />
 </head>
 <body data-fx-opacity="0.85">
   <div class="fx-blob f1"></div><div class="fx-blob f2"></div><div class="fx-blob f3"></div>
@@ -96,7 +99,7 @@
     </section>
   </main>
 
-  <script src="assets/doc-analyze.js?v=da5"></script>
+  <script src="assets/doc-analyze.js?v=da7"></script>
   <script src="assets/bg-fx.js?v=1"></script>
 </body>
 </html>

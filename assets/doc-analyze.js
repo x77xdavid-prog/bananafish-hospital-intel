@@ -11,6 +11,15 @@
   var BACKEND = META && META.content ? META.content.trim() : "";
   var API = BACKEND || (isLocal ? "" : "http://localhost:8000");
 
+  // 서버에 OCR_API_KEY가 설정된 경우, 운영자가 meta에 넣은 토큰을 Bearer로 전송
+  var KEYMETA = document.querySelector('meta[name="ocr-api-key"]');
+  var API_KEY = KEYMETA && KEYMETA.content ? KEYMETA.content.trim() : "";
+  function authHeaders(base) {
+    var h = base || {};
+    if (API_KEY) h["Authorization"] = "Bearer " + API_KEY;
+    return h;
+  }
+
   var FALLBACK_TYPES = ["사업자등록증", "도면/평면도", "의료기관 인허가·법적 서류", "계약서·임대차", "신분증·자격증"];
 
   var el = {
@@ -167,10 +176,16 @@
 
     el.raw.textContent = d.text || "(원문 없음)";
 
-    // 추출 텍스트 저장 위치 표시
+    // 추출 텍스트 저장 위치 + 보안 상태 표시
     if (el.saved) {
       if (d.saved) {
-        el.saved.innerHTML = "💾 추출 텍스트 저장됨 · <code>" + esc(d.saved) + "</code>";
+        var sec = d.secured || {};
+        var tags = [];
+        if (sec.masked) tags.push("민감정보 마스킹");
+        if (sec.encrypted) tags.push("암호화 저장");
+        if (sec.retention_days) tags.push(sec.retention_days + "일 후 자동삭제");
+        var tagStr = tags.length ? " · 🔒 " + esc(tags.join(" · ")) : "";
+        el.saved.innerHTML = "💾 저장됨 <code>" + esc(d.saved) + "</code>" + tagStr;
         show(el.saved);
       } else {
         hide(el.saved);
@@ -202,7 +217,7 @@
 
     fetch(API + "/api/correct", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: authHeaders({ "Content-Type": "application/json" }),
       body: JSON.stringify({
         text: state.last.text,
         source: state.last.source,
@@ -247,7 +262,7 @@
     var fd = new FormData();
     fd.append("file", file);
 
-    fetch(API + "/api/extract", { method: "POST", body: fd })
+    fetch(API + "/api/extract", { method: "POST", body: fd, headers: authHeaders() })
       .then(function (r) {
         return r.json().then(function (body) { return { ok: r.ok, body: body }; });
       })
