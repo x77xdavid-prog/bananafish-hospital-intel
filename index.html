@@ -15,7 +15,7 @@
 
   <!-- NAVER 지도(Dynamic Map)는 별도 CSS 불필요 -->
 
-  <link rel="stylesheet" href="assets/styles.css?v=n14" />
+  <link rel="stylesheet" href="assets/styles.css?v=n16" />
 </head>
 <body data-fx-opacity="0.85">
   <div class="fx-blob f1"></div><div class="fx-blob f2"></div><div class="fx-blob f3"></div>
@@ -55,6 +55,15 @@
         <a class="ghost-btn" href="진단.html" id="diagLink" style="text-decoration:none">⚡ 60초 무료 개원 진단</a>
         <button type="button" class="ghost-btn" id="resetBtn">필터 초기화</button>
       </div>
+    </div>
+    <div class="shell filterbar-toggle">
+      <button type="button" class="filter-toggle" id="filterToggle"
+              aria-expanded="false" aria-controls="filterbar">
+        <svg class="filter-toggle__ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18M6 12h12M10 19h4"/></svg>
+        <span>필터</span>
+        <span class="filter-toggle__n" id="filterCount" hidden></span>
+        <span class="filter-toggle__caret" aria-hidden="true">▾</span>
+      </button>
     </div>
     <div class="shell filterbar" id="filterbar">
       <div class="filtergroup">
@@ -170,7 +179,7 @@
   <!-- data first, then deep, then renderer -->
   <script src="assets/data.js?v=n7"></script>
   <script src="assets/deep.js?v=n1"></script>
-  <script src="assets/app.js?v=n11"></script>
+  <script src="assets/app.js?v=n12"></script>
 
   <!-- 고객 후기 슬라이드 (샘플 데이터 · 추후 실제 후기로 교체) -->
   <script>

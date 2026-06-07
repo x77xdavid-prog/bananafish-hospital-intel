@@ -649,8 +649,18 @@
       if (c.dataset.sido !== undefined) toggleSet(state.sidos, c.dataset.sido, c);
       else if (c.dataset.type !== undefined) toggleSet(state.types, c.dataset.type, c);
       else if (c.dataset.era !== undefined) selectEra(c.dataset.era);
+      updateFilterCount();  // refresh 실패와 무관하게 배지 갱신
       refresh(true);
     });
+
+    // 모바일: 필터 펼치기/접기 토글
+    var filterToggle = el("filterToggle");
+    if (filterToggle) {
+      filterToggle.addEventListener("click", function () {
+        var open = el("filterbar").classList.toggle("is-open");
+        filterToggle.setAttribute("aria-expanded", open ? "true" : "false");
+      });
+    }
 
     el("sortSel").addEventListener("change", function () { state.sort = this.value; refresh(false); });
 
@@ -660,6 +670,7 @@
       document.querySelectorAll("#filterbar .filter-chip").forEach(function (c) {
         c.setAttribute("aria-pressed", c.dataset.era === "all" ? "true" : "false");
       });
+      updateFilterCount();
       refresh(true);
     });
 
@@ -694,6 +705,8 @@
     var toTop = el("toTop");
     window.addEventListener("scroll", function () { toTop.hidden = window.scrollY < 600; }, { passive: true });
     toTop.addEventListener("click", function () { window.scrollTo({ top: 0, behavior: "smooth" }); });
+
+    updateFilterCount();  // 초기 활성 필터 개수 반영
   }
 
   function toggleSet(setObj, key, chipEl) {
@@ -705,6 +718,17 @@
     el("filtersEra").querySelectorAll(".filter-chip").forEach(function (c) {
       c.setAttribute("aria-pressed", c.dataset.era === val ? "true" : "false");
     });
+  }
+
+  // 모바일 필터 토글 버튼에 활성 필터 개수 배지 표시(개원시기 '전체'는 제외)
+  function updateFilterCount() {
+    var badge = el("filterCount");
+    if (!badge) return;
+    var active = document.querySelectorAll(
+      '#filterbar .filter-chip[aria-pressed="true"]:not([data-era="all"])'
+    ).length;
+    if (active > 0) { badge.textContent = active; badge.hidden = false; }
+    else { badge.hidden = true; }
   }
 
   function gotoDeep(id) {

@@ -204,6 +204,24 @@ em { font-style: normal; }
 .filter-chip[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
 .filter-chip__n { font-family: var(--font-mono); font-size: .82em; opacity: .6; margin-left: .3em; }
 
+/* 모바일 필터 토글(데스크톱 숨김) */
+.filterbar-toggle { display: none; }
+.filter-toggle {
+  display: inline-flex; align-items: center; gap: .45rem;
+  font: inherit; font-size: var(--t-xs); font-weight: 600;
+  padding: .5rem .9rem; border-radius: 999px; cursor: pointer;
+  color: var(--ink-soft); background: var(--surface);
+  border: 1px solid var(--line-strong); transition: all var(--dur-fast);
+}
+.filter-toggle:hover { border-color: var(--ink-faint); color: var(--ink); }
+.filter-toggle__ico { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+.filter-toggle__n {
+  font-family: var(--font-mono); font-size: .85em; line-height: 1;
+  background: var(--ink); color: var(--bg); border-radius: 999px; padding: .15em .5em;
+}
+.filter-toggle__caret { font-size: .7em; opacity: .7; transition: transform var(--dur-fast); }
+.filter-toggle[aria-expanded="true"] .filter-toggle__caret { transform: rotate(180deg); }
+
 /* ============ map ============ */
 .mapsection { padding: 1.6rem 0 .6rem; }
 .map {
@@ -492,6 +510,23 @@ details[open] .sources__sum::before { transform: rotate(90deg); }
   .dossier__name { font-size: 1.3rem; }
   .dirrow { grid-template-columns: 1fr auto; }
   .dirrow .c-gu { display: none; }
+}
+
+/* 모바일: 필터를 접어 공간 절약. 펼치면 그룹별 가로 스크롤(한 줄) */
+@media (max-width: 640px) {
+  .filterbar-toggle { display: block; padding-bottom: .7rem; }
+  .filterbar { display: none; }
+  .filterbar.is-open { display: flex; flex-direction: column; flex-wrap: nowrap; gap: .6rem; padding-bottom: 1rem; width: 100%; }
+  .filtergroup { flex-direction: column; align-items: stretch; gap: .35rem; width: 100%; min-width: 0; }
+  .filters {
+    flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch;
+    gap: .4rem; padding-bottom: .25rem; scrollbar-width: none;
+    width: 100%; min-width: 0;
+    -webkit-mask-image: linear-gradient(90deg, #000 92%, transparent);
+            mask-image: linear-gradient(90deg, #000 92%, transparent);
+  }
+  .filters::-webkit-scrollbar { display: none; }
+  .filter-chip { flex: 0 0 auto; }
 }
 
 /* keyfacts inside body on mobile */
