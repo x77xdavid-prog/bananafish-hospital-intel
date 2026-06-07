@@ -8,3 +8,5 @@ build/raw/
 *.png
 .DS_Store
 Thumbs.db
+# 코드 분석 툴 산출물
+.understand-anything/
