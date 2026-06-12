@@ -222,6 +222,26 @@ em { font-style: normal; }
 .filter-toggle__caret { font-size: .7em; opacity: .7; transition: transform var(--dur-fast); }
 .filter-toggle[aria-expanded="true"] .filter-toggle__caret { transform: rotate(180deg); }
 
+/* ============ 사전진단 funnel (V6) ============ */
+.funnel { padding: 1.5rem 0 .2rem; }
+.funnel__title { margin: 0; font-weight: 800; font-size: var(--t-body); color: var(--ink); }
+.funnel__trust { margin: .25rem 0 0; font-size: var(--t-xs); color: var(--accent-deep); font-weight: 600; }
+.funnel__cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: .7rem; margin-top: .9rem; }
+.funnel-card {
+  display: flex; flex-direction: column; gap: .15rem;
+  padding: .85rem 1rem; background: var(--surface);
+  border: 1px solid var(--line-strong); border-radius: var(--r-md);
+  text-decoration: none; color: var(--ink); box-shadow: var(--shadow-card);
+  transition: transform var(--dur-fast) var(--ease), border-color var(--dur-fast);
+}
+.funnel-card:hover { transform: translateY(-2px); border-color: var(--accent); }
+.funnel-card b { font-size: var(--t-sm); }
+.funnel-card span { font-size: var(--t-2xs); color: var(--ink-faint); }
+.funnel-card--primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.funnel-card--primary span { color: oklch(93% 0.03 264); }
+.funnel-card--primary:hover { border-color: var(--accent-deep); }
+@media (max-width: 640px) { .funnel__cards { grid-template-columns: 1fr; } }
+
 /* ============ map ============ */
 .mapsection { padding: 1.6rem 0 .6rem; }
 .map {

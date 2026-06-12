@@ -110,13 +110,19 @@
       html += "</ul></div>";
     }
 
-    html += renderGate();
-    html += '<p class="dg-disclaimer">본 결과는 참고용 1차 진단이며, 최종 적용 기준은 관할기관(보건소·소방서·구청) 협의로 확정됩니다.</p>';
+    // 적용 체크포인트 전체 목록 — 게이트 없이 항상 전부 공개
+    html += renderChecklist(applied);
+    // 다음 행동 카드 3개
+    html += renderNextCards();
+    // 무료 1차 검토 신청(선택) — 결과 열람과 무관
+    html += renderReview();
+    html += '<p class="dg-disclaimer">본 결과는 참고용 1차 진단입니다. 최종 인허가 기준은 관할 보건소·소방서·구청 협의로 확정됩니다.</p>';
     html += '<div class="dg-restart"><button type="button" class="dg-btn dg-btn--ghost" id="dgRestart">↻ 다시 진단하기</button></div>';
 
     $("dgQuiz").hidden = true;
     var r = $("dgResult"); r.hidden = false; r.innerHTML = html;
-    bindGate(applied, band, score);
+    bindReview(applied, band, score);
+    bindGoReview();
     var rb = $("dgRestart");
     if (rb) rb.addEventListener("click", function () {
       state.idx = 0; state.answers = Object.assign({}, DEFAULTS); save();
@@ -129,17 +135,67 @@
   function escapeHtml(s) { return String(s).replace(/[&<>"]/g, function (c) {
     return { "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" }[c]; }); }
 
-  function renderGate() {
+  // 적용 체크포인트 전체 목록 — 카테고리별 접기(details). 연락처 게이트 없음.
+  function renderChecklist(applied) {
+    if (!applied.length) return "";
+    var order = [], byCat = {};
+    applied.forEach(function (it) {
+      if (!byCat[it.cat]) { byCat[it.cat] = []; order.push(it.cat); }
+      byCat[it.cat].push(it);
+    });
+    var html = '<div class="dg-list"><h3>적용 체크포인트 전체 목록</h3>';
+    order.forEach(function (cat, idx) {
+      var items = byCat[cat];
+      html += '<details class="dg-cat"' + (idx === 0 ? " open" : "") + '>'
+        + '<summary><span class="dg-cat__name">' + escapeHtml(cat) + '</span>'
+        + '<span class="dg-cat__n">' + items.length + '</span></summary><ul>';
+      items.forEach(function (it) {
+        html += '<li' + (it.reject ? ' class="is-reject"' : "") + '>' + escapeHtml(it.text)
+          + (it.reject ? ' <em class="dg-flag">반려 다발</em>' : "") + '</li>';
+      });
+      html += '</ul></details>';
+    });
+    html += '</div>';
+    return html;
+  }
+
+  // 결과 하단 다음 행동 카드 3개
+  function renderNextCards() {
     return ''
+      + '<div class="dg-next"><h3>다음 단계</h3><div class="dg-next__grid">'
+      + '<a class="dg-next__card" href="리포트예시.html"><strong>리포트 예시 보기</strong><span>1차 검토 리포트가 어떤 형태로 오는지 미리 확인하세요.</span></a>'
+      + '<a class="dg-next__card" href="비교.html"><strong>후보지 2~3곳 비교해보기</strong><span>전국 병·의원 데이터로 후보지별 경쟁 환경을 비교합니다.</span></a>'
+      + '<a class="dg-next__card" href="#review" id="dgGoReview"><strong>공사 계약 없이 후보지·도면 1차 검토 신청하기</strong><span>아래 신청 섹션으로 이동합니다. 신청은 선택입니다.</span></a>'
+      + '</div></div>';
+  }
+
+  // 무료 1차 검토 신청(선택) — 결과를 잠그지 않는 신청 섹션
+  function renderReview() {
+    return ''
+      + '<section class="dg-review" id="review">'
+      + '<p class="dg-review__kicker">무료 1차 검토 신청 (선택)</p>'
+      + '<h3>공사 계약 없이 후보지·도면 1차 검토 신청하기</h3>'
+      + '<p class="dg-review__desc">진단 응답을 바탕으로 후보지·도면의 인허가 검토 포인트를 정리해 안내해 드립니다.</p>'
+      + '<p class="dg-trust dg-trust--inline">진단과 1차 검토는 공사 계약을 전제로 하지 않습니다.</p>'
       + '<form class="dg-gate" id="dgGate" novalidate>'
-      + '<h3>전체 맞춤 체크리스트 PDF + 무료 1차 검토 받기</h3>'
       + '<label for="gName">성함</label><input type="text" id="gName" name="name" required autocomplete="name" />'
       + '<label for="gPhone">연락처</label><input type="tel" id="gPhone" name="phone" required autocomplete="tel" placeholder="010-0000-0000" />'
       + '<label for="gEmail">이메일</label><input type="email" id="gEmail" name="email" required autocomplete="email" />'
       + '<label class="dg-gate__consent"><input type="checkbox" id="gConsent" required /> <span>개인정보 수집·이용(상담 목적)에 동의합니다.</span></label>'
-      + '<button type="submit" class="dg-btn dg-btn--primary" id="gSubmit">맞춤 체크리스트 받기</button>'
+      + '<button type="submit" class="dg-btn dg-btn--primary" id="gSubmit">1차 검토 신청하기</button>'
       + '<p class="dg-gate__msg" id="gMsg" aria-live="polite"></p>'
-      + "</form>";
+      + '</form>'
+      + '</section>';
+  }
+
+  // "1차 검토 신청" 카드 → 신청 섹션으로 부드럽게 스크롤
+  function bindGoReview() {
+    var go = $("dgGoReview"); if (!go) return;
+    go.addEventListener("click", function (e) {
+      e.preventDefault();
+      var rv = $("review");
+      if (rv) rv.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
   }
 
   function bind() {
@@ -147,9 +203,25 @@
     $("dgStep").addEventListener("click", onPick);
     $("dgNext").addEventListener("click", advance);
     $("dgPrev").addEventListener("click", back);
+
+    // 외부 페이지(리포트예시/비교)에서 #review 딥링크로 진입 시:
+    // 진단 없이도 신청 섹션을 바로 보여준다(결과를 잠그지 않는 V6 원칙의 연장).
+    if (location.hash === "#review") showStandaloneReview();
   }
 
-  function bindGate(applied, band, score) {
+  function showStandaloneReview() {
+    var r = $("dgResult");
+    r.innerHTML = ''
+      + '<p class="dg-review__standalone-note">진단 없이 바로 신청하실 수 있습니다. '
+      + '원하시면 <a href="진단.html">무료 사전진단</a>을 먼저 받아보셔도 됩니다.</p>'
+      + renderReview();
+    r.hidden = false;
+    bindReview(null, null, null);
+    var rv = $("review");
+    if (rv) rv.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function bindReview(applied, band, score) {
     var form = $("dgGate"); if (!form) return;
     if (form.dataset.bound) return;          // 재진입 시 리스너 중복 방지
     form.dataset.bound = "1";
@@ -168,18 +240,19 @@
 
       var payload = {
         name: name, phone: phone, email: email,
-        난이도: band.label, 점수: score, 체크포인트수: applied.length,
+        난이도: band ? band.label : "미진단", 점수: score == null ? "-" : score,
+        체크포인트수: applied ? applied.length : 0,
         진단응답: JSON.stringify(state.answers)
       };
       submitBtn.disabled = true; msg.textContent = "전송 중…";
       submitLead(payload).then(function () {
-        msg.textContent = "접수되었습니다. 맞춤 체크리스트와 1차 검토 안내를 곧 보내드립니다.";
+        msg.textContent = "접수되었습니다. 1차 검토 안내를 곧 보내드립니다.";
         try { localStorage.removeItem(LS_KEY); } catch (e2) {}
       }).catch(function () {
         submitBtn.disabled = false;
         var body = encodeURIComponent("개원 인허가 진단 결과\n" + JSON.stringify(payload, null, 2));
         window.location.href = "mailto:" + FALLBACK_EMAIL + "?subject=" +
-          encodeURIComponent("[셀프진단] " + name + " 님 인허가 의뢰") + "&body=" + body;
+          encodeURIComponent("[1차 검토 신청] " + name + " 님") + "&body=" + body;
       });
     });
   }

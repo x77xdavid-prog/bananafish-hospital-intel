@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>후보지 비교 — 경쟁 현황 · 바나나피쉬</title>
+  <meta name="description" content="개원 후보지(읍·면·동) 2~3곳의 주변 경쟁 현황을 나란히 비교. 반경 내 동일 종별 수, 최근 신규 개원, 종별 TOP3 — 공사 계약 전 무료 간이 비교." />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23344e9b'/%3E%3Cpath d='M16 7v18M7 16h18' stroke='white' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" />
+  <link rel="stylesheet" href="assets/styles.css?v=n16" />
+  <link rel="stylesheet" href="assets/compare.css?v=c1" />
+</head>
+<body data-fx-opacity="0.85">
+  <div class="fx-blob f1"></div><div class="fx-blob f2"></div><div class="fx-blob f3"></div>
+
+  <header class="masthead" role="banner">
+    <div class="shell">
+      <h1 class="masthead__kicker">
+        <a href="index.html" style="display:flex;align-items:center;gap:.6rem;text-decoration:none;color:inherit">
+          <span class="tag tag--brand">BANANAFISH</span>
+          <span class="masthead__kicker-text">후보지 비교 · 경쟁 현황</span>
+        </a>
+        <a href="index.html" style="margin-left:auto;font-size:.82rem;font-weight:600;color:var(--accent);text-decoration:none">← 병원 인텔리전스</a>
+      </h1>
+    </div>
+  </header>
+
+  <main class="shell cmp">
+    <!-- 히어로 -->
+    <section class="cmp-hero">
+      <h2 class="cmp-hero__title">후보지 2~3곳, <em>경쟁 현황</em>을 나란히 비교하세요</h2>
+      <p class="cmp-hero__sub">공사 계약 전, 내 병원의 후보지와 인허가 검토 포인트를 먼저 비교하세요.</p>
+      <p class="cmp-trust">진단과 1차 검토는 공사 계약을 전제로 하지 않습니다.</p>
+      <p class="cmp-hero__note">동(읍·면·동) 단위 간이 비교 — 정밀 분석은 1차 검토에서 제공합니다.</p>
+    </section>
+
+    <!-- 입력부 -->
+    <section class="cmp-form" aria-label="후보지 입력">
+      <div class="cmp-slots" id="cmpSlots">
+        <div class="cmp-slot" data-slot="1">
+          <div class="cmp-slot__head">
+            <span class="cmp-slot__label">후보지 1</span>
+          </div>
+          <div class="cmp-slot__field">
+            <input type="text" class="cmp-slot__input" placeholder="동 이름 검색 — 예: 역삼동" autocomplete="off" disabled aria-label="후보지 1 동 검색" />
+            <div class="cmp-ac" role="listbox" hidden></div>
+          </div>
+          <p class="cmp-slot__picked" hidden></p>
+          <p class="cmp-slot__err" hidden></p>
+        </div>
+
+        <div class="cmp-slot" data-slot="2">
+          <div class="cmp-slot__head">
+            <span class="cmp-slot__label">후보지 2</span>
+          </div>
+          <div class="cmp-slot__field">
+            <input type="text" class="cmp-slot__input" placeholder="동 이름 검색 — 예: 상동" autocomplete="off" disabled aria-label="후보지 2 동 검색" />
+            <div class="cmp-ac" role="listbox" hidden></div>
+          </div>
+          <p class="cmp-slot__picked" hidden></p>
+          <p class="cmp-slot__err" hidden></p>
+        </div>
+
+        <div class="cmp-slot" data-slot="3" hidden>
+          <div class="cmp-slot__head">
+            <span class="cmp-slot__label">후보지 3</span>
+            <button type="button" class="cmp-slot__del" aria-label="후보지 3 삭제" disabled>삭제 ×</button>
+          </div>
+          <div class="cmp-slot__field">
+            <input type="text" class="cmp-slot__input" placeholder="동 이름 검색" autocomplete="off" disabled aria-label="후보지 3 동 검색" />
+            <div class="cmp-ac" role="listbox" hidden></div>
+          </div>
+          <p class="cmp-slot__picked" hidden></p>
+          <p class="cmp-slot__err" hidden></p>
+        </div>
+      </div>
+
+      <!-- 공통 옵션 -->
+      <div class="cmp-opts">
+        <div class="cmp-opt">
+          <span class="cmp-opt__label">종별</span>
+          <select id="cmpCl" class="cmp-sel" disabled aria-label="종별 선택">
+            <option value="의원" selected>의원</option>
+            <option value="치과의원">치과의원</option>
+            <option value="한의원">한의원</option>
+            <option value="병원">병원</option>
+            <option value="한방병원">한방병원</option>
+          </select>
+        </div>
+        <div class="cmp-opt">
+          <span class="cmp-opt__label">진료과목 키워드 <small>(선택)</small></span>
+          <input type="text" id="cmpKw" class="cmp-input" placeholder="예: 내과" autocomplete="off" disabled aria-label="진료과목 키워드" />
+        </div>
+        <div class="cmp-opt">
+          <span class="cmp-opt__label">반경</span>
+          <div class="cmp-seg" id="cmpRadius" role="group" aria-label="반경 선택">
+            <button type="button" class="cmp-seg__btn" data-r="500" aria-pressed="true" disabled>500m</button>
+            <button type="button" class="cmp-seg__btn" data-r="1000" aria-pressed="false" disabled>1km</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="cmp-run">
+        <button type="button" class="cmp-btn" id="cmpRun" disabled>비교하기</button>
+        <button type="button" class="cmp-add" id="cmpAdd" disabled>+ 후보지 추가</button>
+        <p class="cmp-status" id="cmpStatus" role="status">전국 병·의원 데이터(약 36MB)를 불러오는 중…</p>
+      </div>
+    </section>
+
+    <!-- 비교 결과 -->
+    <section class="cmp-results" id="cmpResults" hidden aria-live="polite">
+      <div class="section-head">
+        <span class="section-label">COMPARE <span class="section-label__count">RESULT</span></span>
+        <span class="cmp-results__cond" id="cmpCond"></span>
+      </div>
+      <p class="cmp-results__hint" id="cmpHint" hidden></p>
+      <div class="cmp-grid" id="cmpGrid"></div>
+    </section>
+
+    <!-- 정직성 안내 + CTA -->
+    <section class="cmp-foot" id="cmpFoot" hidden>
+      <p class="cmp-foot__note">동 중심점 기준 단순 반경 집계입니다. 실제 후보지 주소 기준 정밀 분석과 도면 검토는 1차 검토에서 제공합니다.</p>
+      <a class="cmp-cta" href="진단.html#review">공사 계약 없이 1차 검토 신청하기</a>
+      <p class="cmp-foot__disc">최종 인허가 기준은 관할 보건소·소방서·구청 협의로 확정됩니다.</p>
+      <p class="cmp-foot__src">출처: 건강보험심사평가원 · 전국 병의원 및 약국 현황(2026.3.)</p>
+    </section>
+  </main>
+
+  <script src="assets/data.js?v=n7" defer></script>
+  <script src="assets/compare.js?v=c1" defer></script>
+  <script src="assets/bg-fx.js?v=1"></script>
+</body>
+</html>
