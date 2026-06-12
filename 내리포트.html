@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>내 리포트 — 즉석 사전진단 · 바나나피쉬</title>
+  <meta name="description" content="후보지 동과 과목을 입력하면 그 자리에서 내 사전진단 리포트가 나옵니다. 입지·경쟁 실데이터 + 인허가 검토 포인트 — 연락처 없이, 30초." />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23344e9b'/%3E%3Cpath d='M16 7v18M7 16h18' stroke='white' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" />
+  <link rel="stylesheet" href="assets/styles.css?v=n17" />
+  <link rel="stylesheet" href="assets/report-sample.css?v=r2" />
+  <link rel="stylesheet" href="assets/myreport.css?v=m1" />
+</head>
+<body data-fx-opacity="0.85">
+  <div class="fx-blob f1"></div><div class="fx-blob f2"></div><div class="fx-blob f3"></div>
+
+  <header class="masthead" role="banner">
+    <div class="shell">
+      <h1 class="masthead__kicker">
+        <a href="index.html" style="display:flex;align-items:center;gap:.6rem;text-decoration:none;color:inherit">
+          <span class="tag tag--brand">BANANAFISH</span>
+          <span class="masthead__kicker-text">내 리포트 · 즉석 사전진단</span>
+        </a>
+        <a href="index.html" style="margin-left:auto;font-size:.82rem;font-weight:600;color:var(--accent);text-decoration:none">← 병원 인텔리전스</a>
+      </h1>
+    </div>
+  </header>
+
+  <main class="shell mr">
+    <!-- 히어로 -->
+    <section class="mr-hero">
+      <h2 class="mr-hero__title">예시가 아니라, <em>내 후보지</em> 리포트를 지금 받아보세요.</h2>
+      <p class="mr-hero__sub">후보지 동(읍·면·동)과 과목만 고르면 — 입지·경쟁 실데이터와 인허가 검토 포인트를<br />그 자리에서 리포트로 만들어 드립니다. <b>연락처 없이, 30초.</b></p>
+      <p class="mr-trust">진단과 1차 검토는 공사 계약을 전제로 하지 않습니다.</p>
+    </section>
+
+    <!-- 입력 패널 -->
+    <section class="mr-form" aria-label="리포트 조건 입력">
+      <p class="mr-status" id="mrStatus">데이터 불러오는 중…</p>
+
+      <div class="mr-field">
+        <label class="mr-label" for="mrEmd">① 후보지 동 <small>(필수 · 예: 역삼동)</small></label>
+        <div class="mr-emdwrap">
+          <input type="text" id="mrEmd" class="mr-input" placeholder="동 이름 검색 — 예: 역삼동" autocomplete="off" disabled />
+          <div class="mr-suggest" id="mrSuggest" hidden></div>
+        </div>
+        <p class="mr-picked" id="mrPicked" hidden></p>
+        <p class="mr-err" id="mrErr" hidden></p>
+      </div>
+
+      <div class="mr-field">
+        <span class="mr-label">② 기관 유형</span>
+        <div class="mr-chips" id="mrType" role="radiogroup" aria-label="기관 유형">
+          <button type="button" class="mr-chip" data-val="의원" aria-pressed="true">의원</button>
+          <button type="button" class="mr-chip" data-val="치과의원" aria-pressed="false">치과의원</button>
+          <button type="button" class="mr-chip" data-val="한의원" aria-pressed="false">한의원</button>
+        </div>
+      </div>
+
+      <div class="mr-field">
+        <label class="mr-label" for="mrKw">③ 진료과목 키워드 <small>(선택 · 예: 내과, 피부, 정형)</small></label>
+        <input type="text" id="mrKw" class="mr-input" placeholder="예: 내과" autocomplete="off" />
+      </div>
+
+      <div class="mr-field">
+        <span class="mr-label">④ 개원 조건 <small>(잘 모르면 그대로 두세요 — 기본값으로 계산)</small></span>
+        <div class="mr-qgrid">
+          <div class="mr-q"><span class="mr-q__t">건물</span>
+            <div class="mr-chips" data-q="building">
+              <button type="button" class="mr-chip" data-val="new" aria-pressed="true">신축</button>
+              <button type="button" class="mr-chip" data-val="existing" aria-pressed="false">기존 건물 입주</button>
+            </div>
+          </div>
+          <div class="mr-q"><span class="mr-q__t">개원 층</span>
+            <div class="mr-chips" data-q="floors">
+              <button type="button" class="mr-chip" data-val="1" aria-pressed="true">1층</button>
+              <button type="button" class="mr-chip" data-val="2" aria-pressed="false">2층</button>
+              <button type="button" class="mr-chip" data-val="3" aria-pressed="false">3층 이상</button>
+            </div>
+          </div>
+          <div class="mr-q"><span class="mr-q__t">입원실</span>
+            <div class="mr-chips" data-q="inpatient">
+              <button type="button" class="mr-chip" data-val="0" aria-pressed="true">없음</button>
+              <button type="button" class="mr-chip" data-val="4" aria-pressed="false">있음</button>
+            </div>
+          </div>
+          <div class="mr-q"><span class="mr-q__t">수술·마취</span>
+            <div class="mr-chips" data-q="surgery">
+              <button type="button" class="mr-chip" data-val="none" aria-pressed="true">없음</button>
+              <button type="button" class="mr-chip" data-val="sedation" aria-pressed="false">있음</button>
+            </div>
+          </div>
+          <div class="mr-q"><span class="mr-q__t">방사선 장비</span>
+            <div class="mr-chips" data-q="radiology">
+              <button type="button" class="mr-chip" data-val="none" aria-pressed="true">없음</button>
+              <button type="button" class="mr-chip" data-val="xray" aria-pressed="false">X-ray</button>
+              <button type="button" class="mr-chip" data-val="ct" aria-pressed="false">CT</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button type="button" class="mr-go" id="mrGo" disabled>내 리포트 만들기</button>
+      <p class="mr-note">리포트는 브라우저 안에서 즉시 계산됩니다 — 입력 내용이 서버로 전송되지 않습니다.</p>
+    </section>
+
+    <!-- 리포트 출력 (rs-* 리포트 스타일 재사용) -->
+    <section class="rs" id="mrReport" hidden aria-live="polite"></section>
+  </main>
+
+  <script src="assets/checklist-data.js?v=d1" defer></script>
+  <script src="assets/diagnose-logic.js?v=d1" defer></script>
+  <script src="assets/data.js?v=n7" defer></script>
+  <script src="assets/myreport.js?v=m1" defer></script>
+  <script src="assets/bg-fx.js?v=1"></script>
+</body>
+</html>
