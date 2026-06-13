@@ -23,8 +23,12 @@
 .lst-card { position: relative; display: flex; flex-direction: column; gap: .7rem;
   padding: 1.1rem 1.15rem; background: var(--surface); border: 1px solid var(--line);
   border-radius: var(--r-lg); box-shadow: var(--shadow-card); }
-.lst-card__sample { position: absolute; top: .8rem; right: .8rem; font-size: var(--t-2xs); font-weight: 800;
+.lst-card__sample { position: absolute; top: .8rem; right: .8rem; z-index: 2; font-size: var(--t-2xs); font-weight: 800;
   color: var(--warn-fg); background: var(--warn-bg); border-radius: 6px; padding: .12rem .45rem; }
+/* 썸네일 — 카드 상단 풀블리드 16:9 */
+.lst-card__img { margin: -1.1rem -1.15rem .3rem; aspect-ratio: 16 / 9; overflow: hidden;
+  border-radius: var(--r-lg) var(--r-lg) 0 0; background: var(--surface-2); }
+.lst-card__img img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .lst-card__loc { margin: 0; font-family: var(--font-mono); font-size: var(--t-2xs); letter-spacing: .04em; color: var(--ink-faint); }
 .lst-card__title { margin: .15rem 0 .5rem; font-size: 1.1rem; font-weight: 800; letter-spacing: -.01em; }
 .lst-comp { display: inline-block; font-size: var(--t-2xs); font-weight: 700; padding: .22rem .55rem; border-radius: 999px; }

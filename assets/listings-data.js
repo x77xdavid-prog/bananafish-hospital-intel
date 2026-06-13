@@ -18,6 +18,7 @@ window.HII_LISTINGS = [
   {
     id: "L-MAGOK-1", kind: "매매", sido: "서울", gu: "강서구", emd: "마곡동",
     cl: "병원", dept: "의료시설(병원) 단독 건물",
+    image: "assets/listings/magok.jpg",
     price: "250억 원",
     grossArea: "2,338.35㎡ (약 707평)",
     landArea: "1,586㎡ (약 480평)",

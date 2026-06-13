@@ -83,6 +83,12 @@
       + '<a class="lst-card__ask" href="' + askHref(it) + '">문의하기 →</a></footer>';
   }
   function sampleBadge(it) { return it.sample ? '<span class="lst-card__sample">예시</span>' : ''; }
+  // 썸네일 — 로드 실패 시 래퍼 자동 제거(깨진 이미지 방지)
+  function imgHtml(it) {
+    return it.image
+      ? '<div class="lst-card__img"><img src="' + esc(it.image) + '" alt="" loading="lazy" onerror="this.parentNode.remove()"></div>'
+      : '';
+  }
 
   function cardHtml(it) {
     if (it.kind === "매매") return saleCard(it);
@@ -92,7 +98,7 @@
   // 양수(양도양수) 카드 — 권리금·연차 중심
   function transferCard(it) {
     return '<article class="lst-card" data-tilt data-rise>'
-      + sampleBadge(it)
+      + sampleBadge(it) + imgHtml(it)
       + '<header class="lst-card__head">'
       +   '<p class="lst-card__loc">' + esc(it.sido + " " + it.gu + " " + it.emd) + ' · <b class="lst-kind">양수</b></p>'
       +   '<h3 class="lst-card__title">' + esc(it.cl) + (it.dept ? ' · ' + esc(it.dept) : '') + '</h3>'
@@ -117,7 +123,7 @@
       ["주차", it.parking], ["사용승인", it.approval], ["참고", it.note]
     ]);
     return '<article class="lst-card lst-card--sale" data-tilt data-rise>'
-      + sampleBadge(it)
+      + sampleBadge(it) + imgHtml(it)
       + '<header class="lst-card__head">'
       +   '<p class="lst-card__loc">' + esc(it.sido + " " + it.gu + " " + it.emd) + ' · <b class="lst-kind lst-kind--sale">건물 매매</b></p>'
       +   '<h3 class="lst-card__title">' + esc(it.dept || "의료시설(병원)") + '</h3>'
