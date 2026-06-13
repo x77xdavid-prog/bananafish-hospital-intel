@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>병의원 양수 매물 — 바나나피쉬</title>
+  <meta name="description" content="개원 예정 원장님을 위한 병의원 양수(양도양수) 매물 게시판. 각 매물에 반경 경쟁도 자동 표시. 매물 내놓기도 가능 — 공사 계약 전제 없음." />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="바나나피쉬 병원 인텔리전스" />
+  <meta property="og:title" content="병의원 양수 매물 게시판 · 바나나피쉬" />
+  <meta property="og:description" content="검증된 양수 매물에 반경 경쟁도까지 한눈에 — 가장 빠른 개원, 양수." />
+  <meta property="og:image" content="https://x77xdavid-prog.github.io/bananafish-hospital-intel/assets/og-cover.png" />
+  <meta property="og:url" content="https://x77xdavid-prog.github.io/bananafish-hospital-intel/%EB%A7%A4%EB%AC%BC.html" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <!-- 매물 등록 접수 엔드포인트(예: https://formspree.io/f/xxxxxx). 비우면 mailto 폴백. -->
+  <meta name="form-endpoint" content="" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23344e9b'/%3E%3Cpath d='M16 7v18M7 16h18' stroke='white' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" />
+  <link rel="stylesheet" href="assets/styles.css?v=n17" />
+  <link rel="stylesheet" href="assets/fx3d.css?v=f1" />
+  <script>document.documentElement.classList.add('fx3d');</script>
+  <link rel="stylesheet" href="assets/listings.css?v=ls1" />
+</head>
+<body data-fx-opacity="0.85">
+  <div class="fx-blob f1"></div><div class="fx-blob f2"></div><div class="fx-blob f3"></div>
+
+  <header class="masthead" role="banner">
+    <div class="shell">
+      <h1 class="masthead__kicker">
+        <a href="index.html" style="display:flex;align-items:center;gap:.6rem;text-decoration:none;color:inherit">
+          <span class="tag tag--brand">BANANAFISH</span>
+          <span class="masthead__kicker-text">양수 매물 · 병의원 양도양수</span>
+        </a>
+        <a href="index.html" style="margin-left:auto;font-size:.82rem;font-weight:600;color:var(--accent);text-decoration:none">← 병원 인텔리전스</a>
+      </h1>
+    </div>
+  </header>
+
+  <main class="shell lst">
+    <!-- 히어로 -->
+    <section class="lst-hero" data-rise>
+      <h2 class="lst-hero__title">가장 빠른 개원, <em>양수</em>.</h2>
+      <p class="lst-hero__sub">인허가·시설·입지가 이미 검증된 양수 매물을 모았습니다. 각 매물엔 우리 데이터로 <b>반경 경쟁도</b>를 자동 표시 — 개원 판단이 빨라집니다.</p>
+      <p class="lst-trust">참고용 정보 게시이며 직접 중개·거래가 아닙니다. 문의는 운영자 경유.</p>
+    </section>
+
+    <!-- 매물 목록 -->
+    <section aria-label="양수 매물 목록">
+      <div class="lst-head">
+        <h3>등록 매물 <span class="lst-head__count" id="lstCount">0</span>건</h3>
+        <a class="lst-head__post" href="#lstForm">+ 내 매물 내놓기</a>
+      </div>
+      <div class="lst-grid fx3d-stage" id="lstGrid"></div>
+    </section>
+
+    <!-- 매물 내놓기(검수형) -->
+    <section class="lst-form" id="lstForm" aria-label="매물 내놓기">
+      <h3>매물 내놓기</h3>
+      <p class="lst-form__note">접수해 주시면 운영자가 검수 후 게시합니다. <b>연락처는 게시판에 노출되지 않으며</b>, 문의는 운영자가 중계합니다. (의료인 양수 전제 · 참고용)</p>
+      <form id="lstFormEl" novalidate>
+        <div class="lst-fgrid">
+          <div class="lst-field lst-field--wide">
+            <label for="fLoc">소재지 <small>(시·구·동, 예: 서울 강남구 역삼동)</small></label>
+            <input type="text" id="fLoc" autocomplete="off" required />
+          </div>
+          <div class="lst-field">
+            <label for="fCl">종별</label>
+            <select id="fCl">
+              <option>의원</option><option>치과의원</option><option>한의원</option><option>병원</option>
+              <option>요양병원</option><option>한방병원</option><option>치과병원</option><option>종합병원</option>
+            </select>
+          </div>
+          <div class="lst-field"><label for="fDept">진료과목 <small>(예: 내과)</small></label><input type="text" id="fDept" autocomplete="off" /></div>
+          <div class="lst-field"><label for="fArea">전용 평수</label><input type="number" id="fArea" min="1" max="2000" /></div>
+          <div class="lst-field"><label for="fYears">개원 연차</label><input type="number" id="fYears" min="0" max="60" /></div>
+          <div class="lst-field"><label for="fPremium">권리금 <small>(구간으로, 예: 5천~8천)</small></label><input type="text" id="fPremium" autocomplete="off" /></div>
+          <div class="lst-field"><label for="fReason">양도 사유</label><input type="text" id="fReason" autocomplete="off" /></div>
+          <div class="lst-field lst-field--wide"><label for="fDesc">한 줄 설명 <small>(선택)</small></label><textarea id="fDesc"></textarea></div>
+          <div class="lst-field"><label for="fContact">연락처 <small>(필수 · 비공개)</small></label><input type="tel" id="fContact" placeholder="010-0000-0000" required /></div>
+          <div class="lst-field"><label for="fEmail">이메일 <small>(선택)</small></label><input type="email" id="fEmail" autocomplete="off" /></div>
+        </div>
+        <label class="lst-consent"><input type="checkbox" id="fConsent" /> <span>개인정보 수집·이용(매물 검수·중계 목적)에 동의합니다. 연락처는 게시판에 공개되지 않습니다.</span></label>
+        <button type="submit" class="lst-submit" id="lstSubmit">매물 등록 신청</button>
+        <p class="lst-msg" id="lstMsg" role="status"></p>
+      </form>
+    </section>
+
+    <p class="lst-disclaimer">본 게시판은 개원 예정 원장님과 양도 원장님을 연결하기 위한 참고용 정보 서비스이며, 부동산·의료기관 개설 중개 행위가 아닙니다.
+    양수자는 의료인이어야 하며, 권리금·계약·환자정보 등은 당사자 간 별도 확인이 필요합니다. 경쟁도 수치는 동 중심점 기준 단순 반경 집계(심평원 2026.3.)입니다.</p>
+  </main>
+
+  <script src="assets/data.js?v=n7" defer></script>
+  <script src="assets/listings-data.js?v=ls1" defer></script>
+  <script src="assets/listings.js?v=ls1" defer></script>
+  <script src="assets/bg-fx.js?v=1"></script>
+  <script src="assets/fx3d.js?v=f1" defer></script>
+</body>
+</html>
