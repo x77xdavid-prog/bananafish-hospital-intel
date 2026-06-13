@@ -38,6 +38,21 @@
 .lst-card__rows dt { background: var(--surface-2); color: var(--ink-faint); font-size: var(--t-2xs); font-weight: 700; padding: .45rem .6rem; }
 .lst-card__rows dd { margin: 0; font-size: var(--t-xs); color: var(--ink); padding: .45rem .6rem; }
 .lst-card__desc { margin: 0; font-size: var(--t-xs); color: var(--ink-soft); line-height: 1.6; }
+
+/* 매물 유형 배지 + 건물 매매 카드 */
+.lst-kind { font-weight: 800; color: var(--accent-deep); }
+.lst-kind--sale { color: var(--warn-fg); }
+.lst-card--sale { border-color: var(--accent-line); }
+.lst-price { margin: 0; font-size: var(--t-sm); font-weight: 600; color: var(--ink-soft);
+  display: flex; align-items: baseline; gap: .5rem; padding: .5rem .7rem; border-radius: var(--r-md);
+  background: var(--accent-soft); border: 1px solid var(--accent-line); }
+.lst-price b { font-size: 1.35rem; font-weight: 800; letter-spacing: -.02em; color: var(--accent-deep); }
+.lst-more { border: 1px solid var(--line); border-radius: var(--r-sm); overflow: hidden; }
+.lst-more > summary { cursor: pointer; list-style: none; padding: .5rem .7rem; font-size: var(--t-xs); font-weight: 700; color: var(--ink-soft); }
+.lst-more > summary::-webkit-details-marker { display: none; }
+.lst-more > summary::before { content: "▸ "; color: var(--ink-faint); }
+.lst-more[open] > summary::before { content: "▾ "; }
+.lst-more .lst-card__rows { border: 0; border-top: 1px solid var(--line); border-radius: 0; }
 .lst-card__foot { display: flex; align-items: center; justify-content: space-between; margin-top: auto; }
 .lst-card__date { font-size: var(--t-2xs); color: var(--ink-ghost); }
 .lst-card__ask { font-size: var(--t-xs); font-weight: 700; color: var(--accent); text-decoration: none; }

@@ -65,34 +65,71 @@
   }
 
   // ---- 카드 렌더 ----
-  function cardHtml(it) {
+  function rowsDl(pairs) {
+    return '<dl class="lst-card__rows">'
+      + pairs.filter(function (r) { return r[1]; })
+          .map(function (r) { return '<div><dt>' + esc(r[0]) + '</dt><dd>' + esc(r[1]) + '</dd></div>'; }).join("")
+      + '</dl>';
+  }
+  function compHtml(it) {
     var n = sameClNear(it), dens = densityLabel(n);
-    var comp = (n == null)
-      ? '<span class="lst-comp lst-comp--na">경쟁도 데이터 매칭 안됨</span>'
+    return (n == null)
+      ? '<span class="lst-comp lst-comp--na">주변 의료 데이터 매칭 안됨</span>'
       : '<span class="lst-comp lst-comp--' + dens.cls + '">반경 500m ' + esc(it.cl) + ' ' + fmt(n) + '곳 · 입지 ' + dens.t + '</span>';
-    var rows = [
-      ["전용 면적", it.area ? it.area + "평" : "-"],
-      ["개원 연차", it.years != null ? it.years + "년차" : "-"],
-      ["권리금", it.premium || "협의"],
-      ["임대 조건", it.rent || "-"],
-      ["양도 사유", it.reason || "-"]
-    ];
+  }
+  function foot(it) {
+    return '<footer class="lst-card__foot">'
+      + '<span class="lst-card__date">게시 ' + esc(it.posted || "") + '</span>'
+      + '<a class="lst-card__ask" href="' + askHref(it) + '">문의하기 →</a></footer>';
+  }
+  function sampleBadge(it) { return it.sample ? '<span class="lst-card__sample">예시</span>' : ''; }
+
+  function cardHtml(it) {
+    if (it.kind === "매매") return saleCard(it);
+    return transferCard(it);
+  }
+
+  // 양수(양도양수) 카드 — 권리금·연차 중심
+  function transferCard(it) {
     return '<article class="lst-card" data-tilt data-rise>'
-      + (it.sample ? '<span class="lst-card__sample">예시</span>' : '')
+      + sampleBadge(it)
       + '<header class="lst-card__head">'
-      +   '<p class="lst-card__loc">' + esc(it.sido + " " + it.gu + " " + it.emd) + '</p>'
+      +   '<p class="lst-card__loc">' + esc(it.sido + " " + it.gu + " " + it.emd) + ' · <b class="lst-kind">양수</b></p>'
       +   '<h3 class="lst-card__title">' + esc(it.cl) + (it.dept ? ' · ' + esc(it.dept) : '') + '</h3>'
-      +   comp
+      +   compHtml(it)
       + '</header>'
-      + '<dl class="lst-card__rows">'
-      +   rows.map(function (r) { return '<div><dt>' + esc(r[0]) + '</dt><dd>' + esc(r[1]) + '</dd></div>'; }).join("")
-      + '</dl>'
+      + rowsDl([
+          ["전용 면적", it.area ? it.area + "평" : ""],
+          ["개원 연차", it.years != null ? it.years + "년차" : ""],
+          ["권리금", it.premium || "협의"],
+          ["임대 조건", it.rent || ""],
+          ["양도 사유", it.reason || ""]
+        ])
       + (it.desc ? '<p class="lst-card__desc">' + esc(it.desc) + '</p>' : '')
-      + '<footer class="lst-card__foot">'
-      +   '<span class="lst-card__date">게시 ' + esc(it.posted || "") + '</span>'
-      +   '<a class="lst-card__ask" href="' + askHref(it) + '">문의하기 →</a>'
-      + '</footer>'
-      + '</article>';
+      + foot(it);
+  }
+
+  // 매매(건물 통매각) 카드 — 매매가·건물 제원 중심
+  function saleCard(it) {
+    var detail = rowsDl([
+      ["대지면적", it.landArea], ["건축면적", it.buildArea], ["주용도", it.usage],
+      ["건물규모", it.scale], ["주구조", it.structure], ["주요시설", it.facilities],
+      ["주차", it.parking], ["사용승인", it.approval], ["참고", it.note]
+    ]);
+    return '<article class="lst-card lst-card--sale" data-tilt data-rise>'
+      + sampleBadge(it)
+      + '<header class="lst-card__head">'
+      +   '<p class="lst-card__loc">' + esc(it.sido + " " + it.gu + " " + it.emd) + ' · <b class="lst-kind lst-kind--sale">건물 매매</b></p>'
+      +   '<h3 class="lst-card__title">' + esc(it.dept || "의료시설(병원)") + '</h3>'
+      +   compHtml(it)
+      + '</header>'
+      + '<p class="lst-price">매매가 <b>' + esc(it.price || "협의") + '</b></p>'
+      + rowsDl([
+          ["연면적", it.grossArea], ["용도지역", it.zoning], ["주차", it.parking], ["사용승인", it.approval]
+        ])
+      + '<details class="lst-more"><summary>건물 제원 상세</summary>' + detail + '</details>'
+      + (it.desc ? '<p class="lst-card__desc">' + esc(it.desc) + '</p>' : '')
+      + foot(it);
   }
   function askHref(it) {
     var subj = "[매물 문의] " + it.sido + " " + it.gu + " " + it.emd + " " + it.cl + " (" + it.id + ")";
