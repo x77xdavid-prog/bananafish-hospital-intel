@@ -69,7 +69,9 @@
 /* 개원 조건 그리드 */
 .mr-qgrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .7rem .9rem; }
 .mr-q { display: flex; flex-direction: column; gap: .3rem; }
+.mr-q--wide { grid-column: 1 / -1; }   /* 칩이 많은 행(개원 층·영상장비)은 전폭 */
 .mr-q__t { font-family: var(--font-mono); font-size: var(--t-2xs); letter-spacing: .06em; color: var(--ink-faint); }
+.mr-floor-custom { margin-top: .45rem; max-width: 18rem; }
 
 /* 생성 버튼 */
 .mr-go {

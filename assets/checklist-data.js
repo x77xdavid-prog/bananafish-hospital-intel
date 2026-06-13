@@ -9,7 +9,8 @@
     { id: "A3", cat: "사전확인", text: "관할 보건소·소방서·구청 사전협의 완료 및 적용 기준 확정", tags: ["always"], reject: false },
     { id: "A4", cat: "사전확인", text: "정화조 용량 산정(의료시설 오수 기준) 및 증설 필요 여부", tags: ["always"], reject: false },
     { id: "A5", cat: "사전확인", text: "부설주차장 대수 재산정(용도변경 시 추가 의무) 및 장애인전용주차", tags: ["리모델링"], reject: false },
-    { id: "A6", cat: "사전확인", text: "바닥 구조하중 검토(CT 등 대형 장비 도입 시) — 건축 구조도면 확인", tags: ["방사선:ct"], reject: false },
+    { id: "A6", cat: "사전확인", text: "바닥 구조하중 검토(CT·MRI 등 대형 장비 도입 시) — 건축 구조도면 확인", tags: ["중장비"], reject: false },
+    { id: "A7", cat: "사전확인", text: "지하층 의료기관 개설 가능 여부 — 채광·환기·피난 기준 사전 확인(개설 제한 가능)", tags: ["지하"], reject: true },
 
     // B. 평면·실 구획
     { id: "B1", cat: "평면구획", text: "진료실·처치실·수술실 등 천장까지 벽체 완전구획(커튼·파티션 불가)", tags: ["always"], reject: true },
@@ -29,6 +30,9 @@
     { id: "D1", cat: "방사선", text: "방사선 차폐벽 위치·두께·납당량(납판 매수) 명시", tags: ["방사선"], reject: true },
     { id: "D2", cat: "방사선", text: "방사선 관계종사자 방어벽 및 조정실 위치", tags: ["방사선"], reject: false },
     { id: "D3", cat: "방사선", text: "출입문 차폐 및 경고표지·인터록 위치", tags: ["방사선"], reject: false },
+    { id: "D4", cat: "영상장비(MRI)", text: "MRI 자기장 안전구역(5가우스 라인) 설정·출입통제 및 강자성체 반입 차단", tags: ["mri"], reject: true },
+    { id: "D5", cat: "영상장비(MRI)", text: "MRI RF 차폐실(쉴드룸)·비자성 구조재 적용 및 자기장 누설 검토", tags: ["mri"], reject: false },
+    { id: "D6", cat: "영상장비(MRI)", text: "MRI 냉각(칠러)·켄치(quench) 배기관 외부 배출 경로 및 응급차단", tags: ["mri"], reject: false },
 
     // E. 감염·폐기물·소독
     { id: "E1", cat: "감염폐기물", text: "지정폐기물(의료폐기물) 보관실 독립 구획(싱크대 권장)", tags: ["always"], reject: false },
@@ -57,7 +61,8 @@
     { id: "H5", cat: "소방피난", text: "인테리어 마감재 방염 성적서 대상 자재 표기", tags: ["always"], reject: false },
     { id: "H6", cat: "소방피난", text: "비상구·피난유도등·완강기 등 피난기구 위치 및 호실별 피난방향", tags: ["always"], reject: false },
     { id: "H7", cat: "소방피난", text: "제연설비 대상 여부(특별피난계단 부속실·무창층 등) 확인", tags: ["always"], reject: false },
-    { id: "H8", cat: "소방피난", text: "직통계단 2개소·보행 피난거리 30m 이하·무창층 비상탈출구·환기통(건축법 시행령 제34조)", tags: ["다층", "입원실"], reject: true },
+    { id: "H8", cat: "소방피난", text: "직통계단 2개소·보행 피난거리 30m 이하·무창층 비상탈출구·환기통(건축법 시행령 제34조)", tags: ["다층", "입원실", "지하"], reject: true },
+    { id: "H9", cat: "소방피난", text: "지하층 제연설비·비상조명·피난 동선 강화 및 비상탈출구 확보", tags: ["지하"], reject: false },
 
     // I. 장애인 편의시설
     { id: "I1", cat: "장애인편의", text: "주출입구 턱 제거, 단차 시 경사로(구배 1:12 이하) 공간", tags: ["always"], reject: true },
@@ -67,7 +72,7 @@
     { id: "I5", cat: "장애인편의", text: "주출입구 점자블록·유도 및 안내설비", tags: ["always"], reject: false },
 
     // J. 전기·기계·위생
-    { id: "J1", cat: "전기기계위생", text: "수전용량 증설 및 의료기기 전용회로(CT 등 도입 시)", tags: ["방사선:ct"], reject: false },
+    { id: "J1", cat: "전기기계위생", text: "수전용량 증설 및 의료기기 전용회로(CT·MRI 등 도입 시)", tags: ["중장비"], reject: false },
     { id: "J2", cat: "전기기계위생", text: "비상전원(UPS·비상발전기) 회로 — 수술실·중환자실 등", tags: ["수술실"], reject: false },
     { id: "J3", cat: "전기기계위생", text: "의료가스(산소 등) 공급·저장설비 배관 및 안전표기", tags: ["수술실"], reject: false },
     { id: "J4", cat: "전기기계위생", text: "환기·공조 계통도 및 실내공기질 기준 검토", tags: ["always"], reject: false },

@@ -126,7 +126,18 @@
     surgery: "none", radiology: "none", narcotics: false, regen: false,
     building: "new", floors: 1
   };
-  var CL_TO_TYPE = { "의원": "clinic", "치과의원": "dental", "한의원": "oriental" };
+  // 기관유형(데이터 cl 명칭) → DiagLogic 채점용 type + 추가 진료과목 태그
+  // type: 점수 base / 병원급 태그 결정 · depts: 과목 체크포인트(한방·치과 등) 보강
+  var TYPE_CONFIG = {
+    "의원":     { type: "clinic",   depts: [] },
+    "치과의원":  { type: "dental",   depts: [] },
+    "한의원":    { type: "oriental", depts: [] },
+    "병원":     { type: "hospital", depts: [] },
+    "요양병원":  { type: "nursing",  depts: [] },
+    "한방병원":  { type: "hospital", depts: ["oriental"] },
+    "치과병원":  { type: "hospital", depts: ["dental"] },
+    "종합병원":  { type: "general",  depts: [] }
+  };
   var selectedCl = "의원";
 
   // ---- 자동완성 바인딩 ----
@@ -172,12 +183,33 @@
   }
   bindChips("#mrType", function (_g, val) {
     selectedCl = val;
-    answers.type = CL_TO_TYPE[val] || "clinic";
+    var cfg = TYPE_CONFIG[val] || TYPE_CONFIG["의원"];
+    answers.type = cfg.type;
+    answers.depts = cfg.depts.slice();   // 과목 태그(한방병원·치과병원) 보강
   });
   bindChips(".mr-q .mr-chips", function (group, val) {
     var q = group.dataset.q;
-    if (q === "floors" || q === "inpatient") answers[q] = parseInt(val, 10);
-    else answers[q] = val;
+    if (q === "floors") {
+      var fc = $("mrFloorCustom");
+      if (val === "custom") {
+        fc.hidden = false; fc.focus();
+        var n = parseInt(fc.value, 10);
+        answers.floors = isNaN(n) ? 1 : n;
+      } else {
+        fc.hidden = true;
+        answers.floors = (val === "basement") ? "basement" : parseInt(val, 10);
+      }
+    } else if (q === "inpatient") {
+      answers[q] = parseInt(val, 10);
+    } else {
+      answers[q] = val;
+    }
+  });
+
+  // 개원 층 직접 입력(지하는 음수)
+  $("mrFloorCustom").addEventListener("input", function () {
+    var n = parseInt(this.value, 10);
+    answers.floors = isNaN(n) ? 1 : n;
   });
 
   function updateGo() { $("mrGo").disabled = !picked; }

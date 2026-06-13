@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" />
   <link rel="stylesheet" href="assets/styles.css?v=n17" />
   <link rel="stylesheet" href="assets/report-sample.css?v=r2" />
-  <link rel="stylesheet" href="assets/myreport.css?v=m1" />
+  <link rel="stylesheet" href="assets/myreport.css?v=m2" />
 </head>
 <body data-fx-opacity="0.85">
   <div class="fx-blob f1"></div><div class="fx-blob f2"></div><div class="fx-blob f3"></div>
@@ -55,6 +55,11 @@
           <button type="button" class="mr-chip" data-val="의원" aria-pressed="true">의원</button>
           <button type="button" class="mr-chip" data-val="치과의원" aria-pressed="false">치과의원</button>
           <button type="button" class="mr-chip" data-val="한의원" aria-pressed="false">한의원</button>
+          <button type="button" class="mr-chip" data-val="병원" aria-pressed="false">병원</button>
+          <button type="button" class="mr-chip" data-val="요양병원" aria-pressed="false">요양병원</button>
+          <button type="button" class="mr-chip" data-val="한방병원" aria-pressed="false">한방병원</button>
+          <button type="button" class="mr-chip" data-val="치과병원" aria-pressed="false">치과병원</button>
+          <button type="button" class="mr-chip" data-val="종합병원" aria-pressed="false">종합병원</button>
         </div>
       </div>
 
@@ -72,12 +77,15 @@
               <button type="button" class="mr-chip" data-val="existing" aria-pressed="false">기존 건물 입주</button>
             </div>
           </div>
-          <div class="mr-q"><span class="mr-q__t">개원 층</span>
+          <div class="mr-q mr-q--wide"><span class="mr-q__t">개원 층</span>
             <div class="mr-chips" data-q="floors">
+              <button type="button" class="mr-chip" data-val="basement" aria-pressed="false">지하</button>
               <button type="button" class="mr-chip" data-val="1" aria-pressed="true">1층</button>
               <button type="button" class="mr-chip" data-val="2" aria-pressed="false">2층</button>
               <button type="button" class="mr-chip" data-val="3" aria-pressed="false">3층 이상</button>
+              <button type="button" class="mr-chip" data-val="custom" aria-pressed="false">직접 입력</button>
             </div>
+            <input type="number" id="mrFloorCustom" class="mr-input mr-floor-custom" placeholder="층수 직접 입력 (예: 5 · 지하 2층은 -2)" min="-7" max="100" step="1" hidden />
           </div>
           <div class="mr-q"><span class="mr-q__t">입원실</span>
             <div class="mr-chips" data-q="inpatient">
@@ -91,11 +99,13 @@
               <button type="button" class="mr-chip" data-val="sedation" aria-pressed="false">있음</button>
             </div>
           </div>
-          <div class="mr-q"><span class="mr-q__t">방사선 장비</span>
+          <div class="mr-q mr-q--wide"><span class="mr-q__t">영상·방사선 장비</span>
             <div class="mr-chips" data-q="radiology">
               <button type="button" class="mr-chip" data-val="none" aria-pressed="true">없음</button>
               <button type="button" class="mr-chip" data-val="xray" aria-pressed="false">X-ray</button>
               <button type="button" class="mr-chip" data-val="ct" aria-pressed="false">CT</button>
+              <button type="button" class="mr-chip" data-val="mri" aria-pressed="false">MRI</button>
+              <button type="button" class="mr-chip" data-val="dental" aria-pressed="false">치과 구내촬영</button>
             </div>
           </div>
         </div>
@@ -109,10 +119,10 @@
     <section class="rs" id="mrReport" hidden aria-live="polite"></section>
   </main>
 
-  <script src="assets/checklist-data.js?v=d1" defer></script>
-  <script src="assets/diagnose-logic.js?v=d1" defer></script>
+  <script src="assets/checklist-data.js?v=d2" defer></script>
+  <script src="assets/diagnose-logic.js?v=d2" defer></script>
   <script src="assets/data.js?v=n7" defer></script>
-  <script src="assets/myreport.js?v=m1" defer></script>
+  <script src="assets/myreport.js?v=m2" defer></script>
   <script src="assets/bg-fx.js?v=1"></script>
 </body>
 </html>

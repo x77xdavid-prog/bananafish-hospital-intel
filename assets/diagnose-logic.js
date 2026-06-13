@@ -12,10 +12,14 @@
     if (a.radiology === "xray" || a.radiology === "ct") t.add("방사선");
     if (a.radiology === "ct") t.add("방사선:ct");
     if (a.radiology === "dental") t.add("방사선:치과");
+    if (a.radiology === "mri") t.add("mri");                            // MRI는 비전리(납차폐 아님)·자기장/RF 차폐 별도
+    if (a.radiology === "ct" || a.radiology === "mri") t.add("중장비");  // 바닥 구조하중·수전 등 대형장비 공통
     if (a.narcotics) t.add("마약류");
     if (a.regen) t.add("재생의료");
     if (a.building === "existing" || a.situation === "remodel") t.add("리모델링");
-    if (Number(a.floors) >= 2) t.add("다층");  // 다층 태그는 2층↑(승강기·피난). 난이도 점수 가산은 직통계단 2개소 기준인 3층↑에서만(scoreCase).
+    var flNum = parseInt(a.floors, 10);
+    if (a.floors === "basement" || flNum < 0) t.add("지하");            // 지하층 개설(채광·환기·피난·습기)
+    else if (flNum >= 2) t.add("다층");  // 다층 태그는 2층↑(승강기·피난). 난이도 점수 가산은 직통계단 2개소 기준인 3층↑에서만(scoreCase).
     (a.depts || []).forEach(function (d) { if (DEPT_TAG[d]) t.add(DEPT_TAG[d]); });
     return t;
   }
@@ -25,11 +29,12 @@
     var s = base[a.type] || 1;
     if (a.inpatient && Number(a.inpatient) > 0) s += 1;
     if (a.surgery && a.surgery !== "none") s += 1;
-    if (a.radiology === "ct") s += 1;
+    if (a.radiology === "ct" || a.radiology === "mri") s += 1;
     if (a.narcotics) s += 1;
     if (a.regen) s += 1;
     if (a.building === "existing" || a.situation === "remodel") s += 1;
-    if (Number(a.floors) >= 3) s += 1;
+    var flNum = parseInt(a.floors, 10);
+    if (a.floors === "basement" || flNum < 0 || flNum >= 3) s += 1;  // 지하 또는 3층↑ 가산
     return s;
   }
 
