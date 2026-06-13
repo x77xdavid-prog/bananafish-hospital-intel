@@ -1,0 +1,31 @@
+/* fx3d — 사이트 공용 3D 인터랙티브 레이어
+   · [data-tilt]   : 마우스 추적 입체 틸트(hover+fine pointer 환경만)
+   · [data-rise]   : 스크롤 진입 시 입체 등장(아래+rotateX → 제자리)
+   · 깊이감은 그림자 + translateZ로 표현, prefers-reduced-motion 완전 존중.
+   전부 컴포지터 친화 속성(transform·opacity)만 사용 — 성능 안전. */
+
+[data-tilt] {
+  transform-style: preserve-3d;
+  transition: transform .3s var(--ease, cubic-bezier(.2,.7,.2,1)), box-shadow .3s var(--ease, ease);
+  will-change: transform;
+}
+[data-tilt].is-tilting { transition: box-shadow .3s var(--ease, ease); }  /* 틸트 중엔 transform 트랜지션 제거(즉각 반응) */
+[data-tilt]:hover { box-shadow: 0 24px 50px -24px rgba(20, 30, 60, .35); }
+
+/* 등장 — JS(.fx3d) 활성 시에만 숨김. JS 미동작 시 콘텐츠는 그대로 보임(점진적 향상) */
+.fx3d [data-rise] {
+  opacity: 0;
+  transform: translateY(18px) rotateX(7deg);
+  transform-origin: 50% 100%;
+  transition: opacity .6s var(--ease, ease), transform .6s var(--ease, ease);
+  transition-delay: var(--rise-delay, 0ms);
+}
+.fx3d [data-rise].is-in { opacity: 1; transform: none; }
+
+/* 3D 무대(틸트 자식이 들어가는 컨테이너에 원근감 부여) */
+.fx3d-stage { perspective: 1100px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .fx3d [data-rise] { opacity: 1; transform: none; transition: none; }
+  [data-tilt] { transition: box-shadow .2s ease; }
+}

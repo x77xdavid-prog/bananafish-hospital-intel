@@ -134,8 +134,8 @@
     "한의원":    { type: "oriental", depts: [] },
     "병원":     { type: "hospital", depts: [] },
     "요양병원":  { type: "nursing",  depts: [] },
-    "한방병원":  { type: "hospital", depts: ["oriental"] },
-    "치과병원":  { type: "hospital", depts: ["dental"] },
+    "한방병원":  { type: "oriental_hospital", depts: [] },
+    "치과병원":  { type: "dental_hospital", depts: [] },
     "종합병원":  { type: "general",  depts: [] }
   };
   var selectedCl = "의원";
@@ -215,7 +215,7 @@
   function updateGo() { $("mrGo").disabled = !picked; }
 
   // ---- 리포트 생성 ----
-  $("mrGo").addEventListener("click", function () {
+  function generate() {
     if (!picked) return;
     var kw = $("mrKw").value.trim();
     var near = aggregate(picked, RADIUS_M, selectedCl, kw);
@@ -225,8 +225,54 @@
     var band = window.DiagLogic.difficultyBand(score);
     var applied = window.DiagLogic.matchCheckpoints(answers, window.CHECKLIST);
     var top = window.DiagLogic.topConcerns(applied, 3);
+    updateShareUrl(kw);   // 재현·공유용 URL 해시 갱신
     renderReport({ kw: kw, near: near, wide: wide, dens: dens, score: score, band: band, applied: applied, top: top });
-  });
+  }
+  $("mrGo").addEventListener("click", generate);
+
+  // ---- 공유(URL 해시) ----
+  function currentState(kw) {
+    return {
+      e: picked.sido + "|" + picked.gu + "|" + picked.emd,
+      c: selectedCl, k: kw || "",
+      b: answers.building, f: String(answers.floors),
+      i: answers.inpatient, s: answers.surgery, r: answers.radiology
+    };
+  }
+  function updateShareUrl(kw) {
+    var hash = "#r=" + encodeURIComponent(JSON.stringify(currentState(kw)));
+    if (history.replaceState) history.replaceState(null, "", location.pathname + location.search + hash);
+    else location.hash = hash;
+  }
+  function qGroup(q) { return document.querySelector('.mr-q .mr-chips[data-q="' + q + '"]'); }
+  function pressChip(group, val) {
+    if (!group) return;
+    Array.prototype.forEach.call(group.querySelectorAll(".mr-chip"), function (c) {
+      c.setAttribute("aria-pressed", c.dataset.val === val ? "true" : "false");
+    });
+  }
+  function applyState(st) {
+    var e = emdList.filter(function (x) { return (x.sido + "|" + x.gu + "|" + x.emd) === st.e; })[0];
+    if (!e) return false;
+    pickEmd(e);
+    if (st.c && TYPE_CONFIG[st.c]) {
+      selectedCl = st.c;
+      var cfg = TYPE_CONFIG[st.c]; answers.type = cfg.type; answers.depts = cfg.depts.slice();
+      pressChip($("mrType"), st.c);
+    }
+    if (st.k) $("mrKw").value = st.k;
+    if (st.b) { answers.building = st.b; pressChip(qGroup("building"), st.b); }
+    if (st.i != null) { answers.inpatient = parseInt(st.i, 10) || 0; pressChip(qGroup("inpatient"), String(st.i)); }
+    if (st.s) { answers.surgery = st.s; pressChip(qGroup("surgery"), st.s); }
+    if (st.r) { answers.radiology = st.r; pressChip(qGroup("radiology"), st.r); }
+    if (st.f != null) {
+      var fv = String(st.f), fc = $("mrFloorCustom"), fg = qGroup("floors");
+      if (fv === "basement") { answers.floors = "basement"; pressChip(fg, "basement"); fc.hidden = true; }
+      else if (fv === "1" || fv === "2" || fv === "3") { answers.floors = parseInt(fv, 10); pressChip(fg, fv); fc.hidden = true; }
+      else { answers.floors = parseInt(fv, 10); pressChip(fg, "custom"); fc.hidden = false; fc.value = fv; }
+    }
+    return true;
+  }
 
   function bar(label, n, maxN, hot) {
     var w = maxN ? Math.max(3, Math.round(n / maxN * 100)) : 0;
@@ -275,6 +321,11 @@
 
     var maxBar = Math.max(r.near.total, 1);
     var html = ''
+      + '<div class="mr-actions" data-rise>'
+      +   '<button type="button" class="mr-act mr-act--primary" id="mrPrint">🖨 PDF·인쇄로 저장</button>'
+      +   '<button type="button" class="mr-act" id="mrShare">🔗 링크 복사·공유</button>'
+      +   '<span class="mr-act__msg" id="mrShareMsg" role="status"></span>'
+      + '</div>'
       + '<article class="rs-doc">'
       + '<section class="rs-sec rs-cover">'
       +   '<p class="rs-cover__kicker">BANANAFISH · MY PRE-DIAGNOSIS REPORT</p>'
@@ -318,14 +369,14 @@
       + '</section>'
 
       + '<section class="rs-sec rs-next"><h3>04 · 다음 행동</h3>'
-      +   '<div class="rs-ctas">'
-      +     '<a class="rs-cta rs-cta--primary" href="진단.html#review">'
+      +   '<div class="rs-ctas fx3d-stage">'
+      +     '<a class="rs-cta rs-cta--primary" href="진단.html#review" data-tilt>'
       +       '<span class="rs-cta__main">공사 계약 없이 1차 검토 신청하기</span>'
       +       '<span class="rs-cta__sub">후보지·도면을 사람이 직접 봅니다 · 신청은 선택</span></a>'
-      +     '<a class="rs-cta" href="비교.html">'
+      +     '<a class="rs-cta" href="비교.html" data-tilt>'
       +       '<span class="rs-cta__main">후보지 2~3곳 비교해보기</span>'
       +       '<span class="rs-cta__sub">다른 동과 경쟁 환경을 나란히</span></a>'
-      +     '<a class="rs-cta" href="진단.html">'
+      +     '<a class="rs-cta" href="진단.html" data-tilt>'
       +       '<span class="rs-cta__main">정밀 인허가 진단 받기</span>'
       +       '<span class="rs-cta__sub">마약류·재생의료 등 세부 조건 반영</span></a>'
       +   '</div>'
@@ -341,10 +392,50 @@
     var box = $("mrReport");
     box.innerHTML = html;
     box.hidden = false;
+    bindReportActions(box);
+    if (window.FX3D) window.FX3D.apply(box);   // 동적 리포트에도 3D 인터랙션 적용
     box.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  // ---- 저장(인쇄/PDF) · 공유 ----
+  function shareMsg(box, text) {
+    var m = box.querySelector("#mrShareMsg"); if (!m) return;
+    m.textContent = text; m.classList.add("is-on");
+    setTimeout(function () { m.classList.remove("is-on"); }, 2600);
+  }
+  function copyLink(box, url) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url)
+        .then(function () { shareMsg(box, "링크가 복사되었습니다."); })
+        .catch(function () { window.prompt("아래 링크를 복사하세요", url); });
+    } else { window.prompt("아래 링크를 복사하세요", url); }
+  }
+  function bindReportActions(box) {
+    var pr = box.querySelector("#mrPrint");
+    if (pr) pr.addEventListener("click", function () {
+      Array.prototype.forEach.call(box.querySelectorAll("details"), function (d) { d.open = true; });
+      window.print();
+    });
+    var sh = box.querySelector("#mrShare");
+    if (sh) sh.addEventListener("click", function () {
+      var url = location.href;
+      if (navigator.share) {
+        navigator.share({ title: "내 개원 사전진단 리포트", url: url })
+          .then(function () { shareMsg(box, "공유했습니다."); })
+          .catch(function () { copyLink(box, url); });
+      } else { copyLink(box, url); }
+    });
   }
 
   // ---- 준비 완료 ----
   $("mrStatus").textContent = "전국 " + fmt(hospitals.length) + "곳 데이터 준비 완료 — 후보지 동을 입력하세요.";
   emdInput.disabled = false;
+
+  // 공유 링크(#r=...)로 들어오면 입력 복원 후 자동 재생성
+  (function loadFromHash() {
+    var m = location.hash.match(/#r=(.+)$/);
+    if (!m) return;
+    try { var st = JSON.parse(decodeURIComponent(m[1])); if (applyState(st)) generate(); }
+    catch (e) { /* 잘못된 해시 무시 */ }
+  })();
 })();

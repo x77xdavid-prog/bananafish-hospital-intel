@@ -16,6 +16,8 @@
   <!-- NAVER 지도(Dynamic Map)는 별도 CSS 불필요 -->
 
   <link rel="stylesheet" href="assets/styles.css?v=n17" />
+  <link rel="stylesheet" href="assets/fx3d.css?v=f1" />
+  <script>document.documentElement.classList.add('fx3d');</script>
 </head>
 <body data-fx-opacity="0.85">
   <div class="fx-blob f1"></div><div class="fx-blob f2"></div><div class="fx-blob f3"></div>
@@ -87,14 +89,14 @@
       <p class="funnel__title">공사 계약 전, 내 병원의 후보지와 인허가 검토 포인트를 먼저 비교하세요.</p>
       <p class="funnel__trust">진단과 1차 검토는 공사 계약을 전제로 하지 않습니다.</p>
     </div>
-    <div class="funnel__cards">
-      <a class="funnel-card funnel-card--primary" href="내리포트.html">
+    <div class="funnel__cards fx3d-stage">
+      <a class="funnel-card funnel-card--primary" href="내리포트.html" data-tilt data-rise>
         <b>내 후보지 리포트 받기</b><span>동·과목만 입력 → 30초 · 연락처 없이 즉시</span>
       </a>
-      <a class="funnel-card" href="리포트예시.html">
+      <a class="funnel-card" href="리포트예시.html" data-tilt data-rise>
         <b>리포트 예시 먼저 보기</b><span>결과가 어떻게 나오는지 미리 확인</span>
       </a>
-      <a class="funnel-card" href="비교.html">
+      <a class="funnel-card" href="비교.html" data-tilt data-rise>
         <b>후보지 2~3곳 비교해보기</b><span>주변 경쟁 현황을 나란히</span>
       </a>
     </div>
@@ -224,5 +226,6 @@
   })();
   </script>
   <script src="assets/bg-fx.js?v=1"></script>
+  <script src="assets/fx3d.js?v=f1" defer></script>
 </body>
 </html>

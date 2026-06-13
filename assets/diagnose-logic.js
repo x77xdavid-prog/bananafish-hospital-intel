@@ -2,11 +2,13 @@
   var DEPT_TAG = { nephro:"과목:신장", psych:"과목:정신", obgyn:"과목:산부인",
     gi:"과목:소화기", oriental:"과목:한방", dental:"과목:치과" };
 
+  var HOSPITAL_GRADE = ["hospital", "general", "nursing", "oriental_hospital", "dental_hospital"];
+
   function deriveActiveTags(a) {
     var t = new Set(["always"]);
-    if (a.type === "hospital" || a.type === "general" || a.type === "nursing") t.add("병원급");
-    if (a.type === "dental") t.add("과목:치과");
-    if (a.type === "oriental") t.add("과목:한방");
+    if (HOSPITAL_GRADE.indexOf(a.type) !== -1) t.add("병원급");
+    if (a.type === "dental" || a.type === "dental_hospital") t.add("과목:치과");
+    if (a.type === "oriental" || a.type === "oriental_hospital") t.add("과목:한방");
     if (a.inpatient && Number(a.inpatient) > 0) t.add("입원실");
     if (a.surgery && a.surgery !== "none") t.add("수술실");  // surgery: 'none'|'sedation'|'general' (sedation=계획된 진정도 수술실 기준 적용)
     if (a.radiology === "xray" || a.radiology === "ct") t.add("방사선");
@@ -25,7 +27,8 @@
   }
 
   function scoreCase(a) {
-    var base = { clinic:1, dental:1, oriental:1, nursing:2, hospital:2, general:3 };
+    var base = { clinic:1, dental:1, oriental:1, nursing:2, hospital:2,
+      oriental_hospital:2, dental_hospital:2, general:3 };
     var s = base[a.type] || 1;
     if (a.inpatient && Number(a.inpatient) > 0) s += 1;
     if (a.surgery && a.surgery !== "none") s += 1;

@@ -120,7 +120,29 @@
   background: var(--warn-bg); border-radius: 5px; padding: .05rem .35rem;
 }
 
+/* 저장·공유 액션 바 */
+.mr-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; margin-bottom: 1rem; }
+.mr-act {
+  font: inherit; font-size: var(--t-xs); font-weight: 700; cursor: pointer;
+  padding: .5rem .9rem; border-radius: 999px; border: 1px solid var(--line-strong);
+  background: var(--surface); color: var(--ink-soft); transition: all var(--dur-fast);
+}
+.mr-act:hover { border-color: var(--accent); color: var(--accent-deep); }
+.mr-act--primary { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.mr-act--primary:hover { background: var(--accent-deep); color: #fff; border-color: var(--accent-deep); }
+.mr-act__msg { font-size: var(--t-xs); font-weight: 600; color: var(--pos); opacity: 0; transition: opacity var(--dur-fast); }
+.mr-act__msg.is-on { opacity: 1; }
+
 @media (max-width: 640px) {
   .mr-qgrid { grid-template-columns: 1fr; }
   .mr-hero__sub br { display: none; }
+}
+
+/* 인쇄·PDF: 리포트 본문만 남기고 입력·헤더·배경 숨김 */
+@media print {
+  .fx-blob, .masthead, .mr-hero, .mr-form, .mr-actions { display: none !important; }
+  .mr { padding: 0 !important; gap: 0 !important; }
+  .rs-doc { box-shadow: none !important; border: none !important; }
+  .mr-cat, .rs-sec, .rs-stat, .mr-top { break-inside: avoid; }
+  a[href]::after { content: ""; }
 }

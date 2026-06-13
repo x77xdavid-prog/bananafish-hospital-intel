@@ -4,15 +4,20 @@
   var $ = function (id) { return document.getElementById(id); };
   var LS_KEY = "bf_diag_v1";
 
-  // 서버리스 폼 엔드포인트(사용자 설정). 비어 있으면 mailto 폴백 사용.
-  var FORM_ENDPOINT = ""; // 예: "https://formspree.io/f/xxxxxx"
-  var FALLBACK_EMAIL = "bananafish@naver.com"; // 리드 수신 이메일
+  // 서버리스 폼 엔드포인트 — 진단.html의 <meta name="form-endpoint" content="..."> 로 설정.
+  // 비어 있으면 mailto 폴백 사용. (예: Formspree "https://formspree.io/f/xxxxxx")
+  var FORM_ENDPOINT = (function () {
+    var m = document.querySelector('meta[name="form-endpoint"]');
+    return m && m.content ? m.content.trim() : "";
+  })();
+  var FALLBACK_EMAIL = "bananafish@naver.com"; // 리드 수신 이메일(폴백)
 
   var QUESTIONS = [
     { key:"situation", q:"어떤 상황이세요?", type:"single", options:[
       ["new","신규 개원"],["move","이전"],["expand","증축·확장"],["remodel","리모델링"],["add_dept","진료과목 추가"]] },
     { key:"type", q:"기관 유형은?", type:"single", options:[
-      ["clinic","의원"],["hospital","병원"],["general","종합병원"],["dental","치과의원"],["oriental","한의원"],["nursing","요양병원"]] },
+      ["clinic","의원"],["dental","치과의원"],["oriental","한의원"],["hospital","병원"],
+      ["nursing","요양병원"],["oriental_hospital","한방병원"],["dental_hospital","치과병원"],["general","종합병원"]] },
     { key:"depts", q:"주요 진료과목 (복수 선택)", type:"multi", options:[
       ["internal","내과"],["ortho","정형외과"],["radiology","영상의학"],["gi","소화기(내시경)"],
       ["nephro","신장(투석)"],["psych","정신건강의학"],["obgyn","산부인과"],["dental","치과"],["oriental","한방"],["etc","기타"]] },
@@ -20,14 +25,14 @@
       [0,"아니오"],[4,"예 — 1~4병상"],[10,"예 — 5병상 이상"]] },
     { key:"surgery", q:"수술실/마취 시행 계획은?", type:"single", options:[
       ["none","없음"],["sedation","진정(수면) 마취"],["general","전신마취"]] },
-    { key:"radiology", q:"방사선 장비는?", type:"single", options:[
-      ["none","없음"],["xray","일반 X-ray"],["ct","CT"],["dental","치과 구내촬영"]] },
+    { key:"radiology", q:"영상·방사선 장비는?", type:"single", options:[
+      ["none","없음"],["xray","일반 X-ray"],["ct","CT"],["mri","MRI"],["dental","치과 구내촬영"]] },
     { key:"narcotics", q:"마약류·향정신성의약품을 취급하나요?", type:"bool", options:[[true,"예"],[false,"아니오"]] },
     { key:"regen", q:"첨단재생의료 실시기관 지정을 추진하나요?", type:"bool", options:[[true,"예"],[false,"아니오"]] },
     { key:"building", q:"건물 상태는?", type:"single", options:[
       ["new","신축"],["existing","기존 건물 입주(리모델링)"]] },
     { key:"floors", q:"개원 층은 몇 층인가요?", type:"single", options:[
-      [1,"1층(단층)"],[2,"2층"],[3,"3층 이상"]] }
+      ["basement","지하"],[1,"1층(단층)"],[2,"2층"],[3,"3층 이상"]] }
   ];
 
   var DEFAULTS = { situation:"new", type:"clinic", depts:[], inpatient:0, surgery:"none",
@@ -78,7 +83,8 @@
 
   function parseVal(qd, raw) {
     if (qd.type === "bool") return raw === "true";
-    if (qd.key === "inpatient" || qd.key === "floors") return parseInt(raw, 10);
+    if (qd.key === "floors") return raw === "basement" ? "basement" : parseInt(raw, 10);
+    if (qd.key === "inpatient") return parseInt(raw, 10);
     return raw;
   }
 
