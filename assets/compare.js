@@ -312,7 +312,7 @@
 
   function cardHtml(row, cl, kw, rLabel) {
     var e = row.e, agg = row.agg;
-    var h = '<article class="cmp-card' + (row.best ? " is-best" : "") + '">';
+    var h = '<article class="cmp-card' + (row.best ? " is-best" : "") + '" data-tilt data-rise>';
     if (row.best) h += '<span class="cmp-card__badge">상대적 여유</span>';
     h += '<header class="cmp-card__head">' +
            '<p class="cmp-card__region">' + escapeHtml(e.sido + " " + e.gu) + '</p>' +
@@ -380,6 +380,7 @@
     var html = "";
     rows.forEach(function (r) { html += cardHtml(r, cl, kw, rLabel); });
     grid.innerHTML = html;
+    if (window.FX3D) window.FX3D.apply(grid);   // 결과 카드 3D 인터랙션
     cond.textContent = cl + " 기준 · 반경 " + rLabel + (kw ? " · 키워드 ‘" + kw + "’" : "");
     if (rows.length === 1) {
       hint.textContent = "후보지를 1곳 더 추가하면 ‘상대적 여유’까지 나란히 비교할 수 있어요.";

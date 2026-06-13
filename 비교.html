@@ -5,10 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>후보지 비교 — 경쟁 현황 · 바나나피쉬</title>
   <meta name="description" content="개원 후보지(읍·면·동) 2~3곳의 주변 경쟁 현황을 나란히 비교. 반경 내 동일 종별 수, 최근 신규 개원, 종별 TOP3 — 공사 계약 전 무료 간이 비교." />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="바나나피쉬 병원 인텔리전스" />
+  <meta property="og:title" content="후보지 2~3곳 경쟁 비교 · 바나나피쉬" />
+  <meta property="og:description" content="개원 후보지의 주변 경쟁 현황을 나란히 — 공사 계약 전 무료 간이 비교." />
+  <meta property="og:image" content="https://x77xdavid-prog.github.io/bananafish-hospital-intel/assets/og-cover.png" />
+  <meta property="og:url" content="https://x77xdavid-prog.github.io/bananafish-hospital-intel/%EB%B9%84%EA%B5%90.html" />
+  <meta name="twitter:card" content="summary_large_image" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23344e9b'/%3E%3Cpath d='M16 7v18M7 16h18' stroke='white' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" />
-  <link rel="stylesheet" href="assets/styles.css?v=n16" />
+  <link rel="stylesheet" href="assets/styles.css?v=n17" />
+  <link rel="stylesheet" href="assets/fx3d.css?v=f1" />
+  <script>document.documentElement.classList.add('fx3d');</script>
   <link rel="stylesheet" href="assets/compare.css?v=c1" />
 </head>
 <body data-fx-opacity="0.85">
@@ -28,7 +37,7 @@
 
   <main class="shell cmp">
     <!-- 히어로 -->
-    <section class="cmp-hero">
+    <section class="cmp-hero" data-rise>
       <h2 class="cmp-hero__title">후보지 2~3곳, <em>경쟁 현황</em>을 나란히 비교하세요</h2>
       <p class="cmp-hero__sub">공사 계약 전, 내 병원의 후보지와 인허가 검토 포인트를 먼저 비교하세요.</p>
       <p class="cmp-trust">진단과 1차 검토는 공사 계약을 전제로 하지 않습니다.</p>
@@ -115,7 +124,7 @@
         <span class="cmp-results__cond" id="cmpCond"></span>
       </div>
       <p class="cmp-results__hint" id="cmpHint" hidden></p>
-      <div class="cmp-grid" id="cmpGrid"></div>
+      <div class="cmp-grid fx3d-stage" id="cmpGrid"></div>
     </section>
 
     <!-- 정직성 안내 + CTA -->
@@ -128,7 +137,8 @@
   </main>
 
   <script src="assets/data.js?v=n7" defer></script>
-  <script src="assets/compare.js?v=c1" defer></script>
+  <script src="assets/compare.js?v=c2" defer></script>
   <script src="assets/bg-fx.js?v=1"></script>
+  <script src="assets/fx3d.js?v=f1" defer></script>
 </body>
 </html>

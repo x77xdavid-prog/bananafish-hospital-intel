@@ -6,6 +6,8 @@ build/raw/
 # 로컬 테스트 산출물
 .playwright-mcp/
 *.png
+# OG 미리보기 이미지는 배포 대상(예외)
+!assets/og-cover.png
 .DS_Store
 Thumbs.db
 # 코드 분석 툴 산출물
